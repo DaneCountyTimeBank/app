@@ -1,0 +1,71 @@
+<template>
+  <f7-page name="news">
+    <f7-navbar sliding back-link="Back">
+      <f7-nav-center>
+          {{story.title}}
+      </f7-nav-center>
+    </f7-navbar>
+
+    <f7-block class="center-preloader" v-if="!loaded">
+        <f7-preloader></f7-preloader>
+    </f7-block>
+    <f7-block v-if="load_error">
+        Error loading news - please try again later.
+    </f7-block>
+
+    <f7-block v-if="loaded">
+
+        <h4>{{story.title}}</h4>
+        <img v-if="story.image" :src="story.image.url" width="100%" :style="{maxWidth: story.image.width + 'px'}" />
+
+        <p v-html="story.body_html"></p>
+
+        <div class="story-meta">
+            Posted {{story.created | timestamp_to_date}} by {{story.user_name}}
+        </div>
+
+    </f7-block>
+
+  </f7-page>
+</template>
+
+<script>
+
+    import Timebank from '../timebank';
+
+    export default {
+        props: ['story_id'],
+        name: 'News',
+        data () {
+            return {
+                story: this.$root.story || {},
+                loaded: false,
+                load_error: false,
+            };
+        },
+
+        created () {
+            Timebank.get_story(
+                this.story_id, 
+                story => {
+                    this.loaded = true;
+                    this.story = story;
+                },
+                () => {
+                    this.load_error = true;
+                }
+            );
+        }
+    };
+
+</script>
+
+<style>
+
+.story-meta {
+    color: #666;
+    margin: 35px 0;
+}
+
+</style>
+
