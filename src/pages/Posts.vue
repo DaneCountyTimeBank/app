@@ -40,7 +40,7 @@
             </div>
         </f7-list-item>
         
-        <f7-list-item v-for="post in posts" @click="selectPost(post)" :title="post.title">
+        <f7-list-item v-for="post in posts" @click="selectPost(post)" :title="post.title" :key="post.post_id">
             <div class="item-text">
                 {{post.type_display}}
                 <template v-if="exchange || !user_id">

@@ -410,7 +410,7 @@ function create_transaction(args, success, error) {
 }
 
 function _transaction(x) {
-    // serial, xid, 
+    // x also has a serial property..
 
     var category_ids = [];
 
@@ -419,6 +419,7 @@ function _transaction(x) {
     });
 
     return {
+        transaction_id: x.xid,
         created: x.created, // timestamp
 
         // user_ids

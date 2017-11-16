@@ -16,7 +16,7 @@ import ImprovedSelect from './components/ImprovedSelect';
 import ImprovedDatepicker from './components/ImprovedDatepicker';
 
 
-// TODO: upgrade to newest framework7-vue version (0.9.3) but probably doesn't fix my select issue
+// TODO later: upgrade to vue-loader v13+ once I figure out why it breaks things (presumably a configuration option..)
 
 /*
 // to ease debugging via console

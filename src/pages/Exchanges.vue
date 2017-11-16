@@ -1,9 +1,6 @@
 <template>
   <f7-page name="exchanges" pull-to-refresh @ptr:refresh="onPullToRefresh" :pull-to-refresh-distance="44" >
-    <f7-navbar sliding>
-      <f7-nav-left>
-        <f7-link icon="icon-bars" open-panel="left"></f7-link>
-      </f7-nav-left>
+    <f7-navbar sliding back-link="Back">
       <f7-nav-center>
           Exchanges
       </f7-nav-center>
@@ -33,7 +30,7 @@
     <f7-list media-list class="exchange-list">
 
         <f7-list-item v-for="exchange in exchanges"
-            :title="exchange.description">
+            :title="exchange.description" :key="exchange.transaction_id">
             <div class="item-text">
                 {{exchange.created | timestamp_to_date}}
                 <div class="exchange-details">

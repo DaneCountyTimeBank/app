@@ -27,7 +27,7 @@
             link="#"
             @click="selectMember(member)"
             :title="member.name"
-
+            :key="member.user_id"
             >
             <div slot="media">
                 <img :src="member | member_picture" style="max-width:64px; max-height:90px;" />

@@ -19,7 +19,7 @@
     </f7-block>
     <template v-if="!stories_loading && !stories_error">
         <f7-list media-list v-if="stories.length !== 0">
-            <f7-list-item v-for="item in stories" :link="item | story_link" @click="selectStory(item)">
+            <f7-list-item v-for="item in stories" :link="item | story_link" @click="selectStory(item)" :key="item.story_id">
                 <div class="item-title-row">
                     <div class="item-title">
                         {{item.title}}
@@ -44,7 +44,7 @@
     </f7-block>
     <template v-if="!events_loading && !events_error">
         <f7-list media-list v-if="events.length !== 0">
-            <f7-list-item v-for="item in events" :link="item | event_link" @click="selectEvent(item)">
+            <f7-list-item v-for="item in events" :link="item | event_link" @click="selectEvent(item)" :key="item.event_id">
                 <div class="item-title-row">
                     <div class="item-title">
                         {{item.title}}
