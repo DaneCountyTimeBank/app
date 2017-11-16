@@ -34,7 +34,7 @@
             </div>
         </f7-list-item>
 
-        <infinite-loading :on-infinite="onInfinite" ref="infiniteLoading" :distance="20" spinner="spiral">
+        <infinite-loading @infinite="onInfinite" ref="infiniteLoading" :distance="20" spinner="spiral">
             <div slot="no-results">
                 <br />
                 <div v-if="above_no_results_text">
@@ -105,6 +105,7 @@
                 instructions_txt: instructions_txt,
                 member_exchange: member_exchange,
                 above_no_results_text: member_exchange ? 'Which member did you exchange with?' : '',
+                infinite: {loaded: () => {}, complete: () => {}, reset: () => {}},
             };
         },
         computed: {
@@ -120,7 +121,7 @@
             resetMembers () {
                 this.no_results_text = this.instructions_txt;
                 this.members = [];
-                this.$refs.infiniteLoading.$emit('$InfiniteLoading:reset');
+                this.infinite.reset();
             },
 
             onPullToRefresh () {
@@ -134,62 +135,57 @@
 
             searchMembers (start) {
 
-                var self = this,
-                    active_query = self.search_query,
-                    same_query = (active_query === self.old_search_query);
+                var active_query = this.search_query,
+                    same_query = (active_query === this.old_search_query);
 
                 if (!same_query) {
                     start = 0;
                 }
 
-                self.no_results_text = self.no_matches_text;
+                this.no_results_text = this.no_matches_text;
 
-                Timebank.search_users({start: start, num: self.num_per_query, query: self.search_query}, function(members) {
+                Timebank.search_users({start: start, num: this.num_per_query, query: this.search_query}, members => {
 
                     // only do if the search term is the same!
-                    if (self.old_search_query === active_query) {
-                        self.members = self.members.concat(members);
+                    if (this.old_search_query === active_query) {
+                        this.members = this.members.concat(members);
                     } else {
-                        self.members = members;
+                        this.members = members;
                     }
 
-                    if (self.members.length > 0) {
-                        self.$refs.infiniteLoading.$emit('$InfiniteLoading:loaded');
+                    if (this.members.length > 0) {
+                        this.infinite.loaded();
                     }
 
-                    if (members.length < self.num_per_query) { 
-                        self.$refs.infiniteLoading.$emit('$InfiniteLoading:complete');
+                    if (members.length < this.num_per_query) { 
+                        this.infinite.complete();
                     }
 
-                    self.old_search_query = active_query;
+                    this.old_search_query = active_query;
 
-                }, function(xhr, status, msg){
+                }, (status, msg) => {
 
                     if (status === 403) {
 
-                        self.members = [];
+                        this.members = [];
                         // complete w/o loaded causes no members found message to be displayed
                     } else {
-                        self.loadError();
+                        this.loadError();
                         //console.log('search members err', xhr, status, msg);
                     }
 
-                    self.$refs.infiniteLoading.$emit('$InfiniteLoading:complete');
+                    this.infinite.complete();
                 });
             },
 
-            onInfinite () {
+            onInfinite ($state) {
+
+                this.infinite = $state;
 
                 var start = this.members.length;
 
                 if (!this.search_query) {
-
-                    // just calling loaded is killing chrome cpu, b/c attempting loads one after another over and over..
-
-                    //this.$refs.infiniteLoading.$emit('$InfiniteLoading:loaded');
-
-                    this.$refs.infiniteLoading.$emit('$InfiniteLoading:complete');
-
+                    this.infinite.complete();
                 } else {
                     this.searchMembers(start);
                 }

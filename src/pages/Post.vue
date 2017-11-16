@@ -5,15 +5,15 @@
           {{ post.title }}
       </f7-nav-center>
     </f7-navbar>
-    
-    <f7-block>
-        <h4 id="post-title">{{post.title}}</h4>
-        <div id="post-date" v-if="post.created">{{post.created | timestamp_to_date}}</div>
+
+    <f7-block-title class="post-title">{{post.title}}</f7-block-title>
+    <f7-block inner>
+        <div class="post-date" v-if="post.created">{{post.created | timestamp_to_date}}</div>
 
         {{post | post_type_desc}} 
         <f7-link v-if="post.user_name" :href="post | profile_link" @click="viewProfile(post)">{{post.user_name}}</f7-link>
 
-        <div id="post-chips">
+        <div class="post-chips">
             <f7-chip v-if="post.area" :text="post.area" bg="purple" color="white"></f7-chip>
             <template v-if="post.categories" v-for="category in post.categories">
                 &nbsp;<f7-chip :text="category.name" bg="green" color="white"></f7-chip>
@@ -27,12 +27,12 @@
             Error loading post - please try again later.
         </f7-block>
 
-        <img id="post-image" v-if="post.image" :src="post.image.url" />
+        <img class="post-image" v-if="post.image" :src="post.image.url" />
 
-        <div id="post-body" v-html="post.body"></div>
+        <div class="post-body" v-html="post.body"></div>
 
         <template v-if="post_loaded && !reply">
-            <div id="post-buttons" class="buttons-row">
+            <div class="post-buttons buttons-row">
                 <template v-if="!own_post">
                     <f7-button @click="showReply()" class="button button-fill button-raised">Reply</f7-button>
                     <f7-button @click="submitPayment(post)" :href="post | payment_link" class="button button-raised">{{post | payment_text }}</f7-button>
@@ -263,18 +263,27 @@
 
 <style>
 
-#post-title {
-    margin-top: -10px;
-    margin-bottom: 10px;
+
+.post-title {
+    margin-top: 15px;
+    white-space: normal;
 }
-#post-date {
+
+.post-date {
     float:right;
 }
-#post-chips {
+.post-chips {
     margin-top: 10px;
     margin-left: -4px;
+    margin-bottom: 20px;
 }
-#post-image {
+
+.ios .bg-purple {
+    /* missing on ios so we define it to be the pink ios theme color */
+    background-color: #ff2d55;
+}
+
+.post-image {
     margin-top: 10px;
     margin-bottom: -8px;
     
@@ -282,10 +291,10 @@
     width: 100%;
     max-width: 480px;
 }
-#post-body {
+.post-body {
     margin-bottom: 26px;
 }
-#post-buttons {
+.post-buttons {
     margin-bottom: 60px;
 }
 

@@ -66,7 +66,7 @@ function args_to_str(args) {
     return Object.keys(args).map((k) => encodeURIComponent(k) + '=' + encodeURIComponent(args[k])).join('&');
 }
 
-function get_posts(args, success) {
+function get_posts(args, success, error) {
     // wants args to be of format: {type: 'offer'/'want', start:0, num:20, query:'search term (optional)', user_ids: '1,2' (optional)}
 
     // TODO later: figure out how to do advanced searches though..
@@ -81,8 +81,10 @@ function get_posts(args, success) {
 
     entity_index('post/index', args || '', {
         success: function(entities) {
-            //log('offers', entities);
             if (success) success(entities);
+        },
+        error: function(xhr, status, msg) {
+            if (error) error(status, msg);
         }
     });
 }

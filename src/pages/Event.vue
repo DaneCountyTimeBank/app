@@ -13,9 +13,8 @@
         Error loading event - please try again later.
     </f7-block>
 
-    <f7-block v-if="loaded">
-
-        <h4>{{event.title}}</h4>
+    <f7-block-title class="event-title">{{event.title}}</f7-block-title>
+    <f7-block inner v-if="loaded">
 
         <img v-if="event.image" :src="event.image.url" width="100%" :style="{maxWidth: event.image.width + 'px'}" />
 
@@ -28,6 +27,7 @@
                 {{event.date|timestamp_to_time}}
             </div>
         </div>
+
         <div class="event-block" v-if="event.details_html">
             <i class="material-icons color-red">place</i>
             <div v-html="event.details_html"></div>
@@ -75,37 +75,33 @@
 
 <style>
 
-/* TODO later: extract b/c common style.. or make center-preloader a component.. */
 .center-preloader {
     text-align: center;
 }
 
-
-
+.event-title {
+    white-space: normal;
+    margin-top: 15px;
+}
 .event-block {
-    margin-top: 20px;
-    font-size:1.2em;
-    float: left;
-    clear: left;
-    white-space: nowrap;
-
+   margin-top: 20px;
+   font-size:1.2em;
 }
 .event-block div {
-    float: left;
+    overflow: hidden; 
     border-left: 1px solid #ccc;
-    padding-left: 22px;
+    padding-left: 22px;   
 }
 .event-block i {
     display: block;
+    width: 28px;
     float: left;
-    margin: 5px 20px 0 0;
+    margin: 5px 20px 10px 0;
 }
 
 .event-meta {
-    color: #666;
-    clear: left;
-    float: left;
     margin: 35px 0;
+    color: #666;
 }
 
 .color-darkgreen {

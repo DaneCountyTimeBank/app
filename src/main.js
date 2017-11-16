@@ -72,7 +72,13 @@ new Vue({ // eslint-disable-line no-new
     animateNavBackIcon: window.isiOS,
     pushState: true,
     pushStateNoAnimation: true,
-    panelLeftBreakpoint: 960
+    panelLeftBreakpoint: 960,
+    preloadPreviousPage: false, // needed to fix iOS going back showing page offset w/ black bar on left and page-on-left class applied erroneously..
+    // may also want to add 'swipeBackPage: false' if swiping back opens left panel instead of previous page and causes issues..
+    // see: https://stackoverflow.com/questions/40146513/framework7-selecting-page-on-center-and-not-page-on-left
+    // and: https://muut.com/i/framework7/questions:disable-page-on-left-histo
+    //
+    // using uniqueHistory: true may also help..
   },
   // Register App Component
   components: {

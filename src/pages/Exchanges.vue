@@ -45,7 +45,7 @@
             </div>
         </f7-list-item>
 
-        <infinite-loading :on-infinite="onInfinite" ref="infiniteLoading" :distance="20" spinner="spiral">
+        <infinite-loading @infinite="onInfinite" ref="infiniteLoading" :distance="20" spinner="spiral">
             <div slot="no-results">
                 <br />
                 <template v-if="search_query">
@@ -96,6 +96,7 @@
                 current_user_id: localStorage.user_id * 1,
                 current_balance: null,
                 loading: true,
+                infinite: {loaded: () => {}, complete: () => {}, reset: () => {}},
             };
         },
         components: {
@@ -126,7 +127,7 @@
 
             resetExchanges () {
                 this.exchanges = [];
-                this.$refs.infiniteLoading.$emit('$InfiniteLoading:reset');
+                this.infinite.reset();
             },
 
             onPullToRefresh () {
@@ -144,9 +145,8 @@
                 // which is the date the exchange took place as specified by user
                 // NOT the date that they recorded the exchange through the site/app
 
-                var self = this,
-                    active_query = self.search_query,
-                    same_query = (active_query === self.old_search_query);
+                var active_query = this.search_query,
+                    same_query = (active_query === this.old_search_query);
 
                 if (!same_query) {
                     start = 0;
@@ -166,11 +166,11 @@
                         }
 
                         if (this.exchanges.length > 0) {
-                            this.$refs.infiniteLoading.$emit('$InfiniteLoading:loaded');
+                            this.infinite.loaded();
                         }
 
                         if (data.transactions.length < this.num_per_query) { 
-                            this.$refs.infiniteLoading.$emit('$InfiniteLoading:complete');
+                            this.infinite.complete();
                         }
 
                         this.old_search_query = active_query;
@@ -188,12 +188,13 @@
                             //console.log('search members err', xhr, status, msg);
                         }
 
-                        this.$refs.infiniteLoading.$emit('$InfiniteLoading:complete');
+                        this.infinite.complete();
                     }
                 );
             },
 
-            onInfinite () {
+            onInfinite ($state) {
+                this.infinite = $state;
 
                 var start = this.exchanges.length;
                 this.getExchanges(start);

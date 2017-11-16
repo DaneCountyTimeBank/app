@@ -26,7 +26,7 @@
 
     <f7-block-title>Not a member yet?</f7-block-title>
 
-    <f7-block inner >
+    <f7-block inner>
         <p>
             TimeBank members are a caring and interconnected community of people who help each other by sharing their abilities, talents, and experiences.
             <br /><br />

@@ -52,7 +52,7 @@
             </div>
         </f7-list-item>
 
-        <infinite-loading :on-infinite="onInfinite" ref="infiniteLoading" :distance="20" spinner="spiral">
+        <infinite-loading @infinite="onInfinite" ref="infiniteLoading" :distance="20" spinner="spiral">
             <div slot="no-results">
                 <br />
                 No posts found
@@ -154,6 +154,7 @@
                 user_name: this.$root.view_user_name || ('Member ' + user_id),
                 exchange: exchange,
                 title: title,
+                infinite: {loaded: () => {}, complete: () => {}, reset: () => {}},
             };
         },
         created () {
@@ -178,7 +179,7 @@
 
             resetPosts () {
                 this.posts = [];
-                this.$refs.infiniteLoading.$emit('$InfiniteLoading:reset');
+                this.infinite.reset();
             },
 
             onPullToRefresh () {
@@ -191,15 +192,14 @@
             },
 
             getPosts () {
-                var self = this,
-                    start = this.posts.length,
+                var start = this.posts.length,
                     num = 20, // XXX: currently search has 20 hardcoded in the PHP code
-                    active_query = self.search_query,
-                    same_query = (!active_query || (active_query === self.old_search_query)),
+                    active_query = this.search_query,
+                    same_query = (!active_query || (active_query === this.old_search_query)),
                     args = {
                         start: same_query ? start : 0,
                         num: num,
-                        type: self.post_type
+                        type: this.post_type
                     };
 
                 if (this.user_id) {
@@ -210,52 +210,52 @@
                     }
                 }
 
-                if (self.search_query) {
-                    args.query = self.search_query;
+                if (this.search_query) {
+                    args.query = this.search_query;
                 }
 
-                Timebank.get_posts(args, function(data) {
+                Timebank.get_posts(args, data => {
 
                     for (var p of data.posts) {
-                        if (self.user_id) {
+                        if (this.user_id) {
                             p.type_display = (p.type === 'offer' ? 'Offer' : 'Request');
                         } else {
                             p.type_display = '';
                         }
                     }
                     
-                    if (!active_query || self.old_search_query === active_query) {
-                        self.old_search_query = '';
-                        self.posts = self.posts.concat(data.posts);
+                    if (!active_query || this.old_search_query === active_query) {
+                        this.old_search_query = '';
+                        this.posts = this.posts.concat(data.posts);
                     } else {
-                        self.posts = data.posts;
+                        this.posts = data.posts;
                     }
 
                     if (data.posts.length > 0) {
-                        self.$refs.infiniteLoading.$emit('$InfiniteLoading:loaded');
+                        this.infinite.loaded();
                     }
                     if (data.posts.length < num) {
-                        self.$refs.infiniteLoading.$emit('$InfiniteLoading:complete');
+                        this.infinite.complete();
                     }
 
-                    if (active_query) self.old_search_query = active_query;
+                    if (active_query) this.old_search_query = active_query;
 
-                }, function(xhr, status, msg){
+                }, (status, msg) => {
 
                     if (status === 404) { // TODO later: check via msg if possible..
 
                         // complete w/o loaded causes no posts found message to be displayed
                     } else {
-                        self.postsError();
+                        this.postsError();
                         //console.log('get posts err', xhr, status, msg);
                     }
 
-                    self.$refs.infiniteLoading.$emit('$InfiniteLoading:complete');
-
+                    this.infinite.complete();
                 });
             },
 
-            onInfinite () {
+            onInfinite ($state) {
+                this.infinite = $state;
                 this.getPosts();
             },
 

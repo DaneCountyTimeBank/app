@@ -21,17 +21,13 @@
             <img v-if="user && user.picture_url" :src="user.picture_url" class="profile-pic" />
         </f7-block>
 
-        <!--
-        <f7-block>
-            <h4 v-if="loaded">{{user_name}}</h4>
-        </f7-block>
-        -->
-
         <template v-if="user.location">
             <f7-block-title>Location</f7-block-title>
-            <f7-block>
+            <f7-block inner>
                 <template v-if="user.location">
-                    {{user.location.street}}<br />
+                    <template v-if="user.location.street">
+                        {{user.location.street}}<br />
+                    </template>
                     <template v-if="user.location.area != user.location.city">
                         {{user.location.area}}<br />
                     </template>
@@ -44,7 +40,7 @@
 
         <template v-if="user.phones">
             <f7-block-title>Phone Numbers</f7-block-title>
-            <f7-block>
+            <f7-block inner>
                 <p>
                     <template v-if="user.phones">
                         <template v-for="phone in user.phones">
@@ -57,21 +53,21 @@
 
         <template v-if="user.description">
             <f7-block-title>About</f7-block-title>
-            <f7-block>
+            <f7-block inner>
                 <div id="user-description" v-if="user.description" v-html="user.description"></div>
             </f7-block>
         </template>
 
         <template v-if="user.created">
             <f7-block-title>Joined</f7-block-title>
-            <f7-block>
+            <f7-block inner>
                 {{user.created | timestamp_to_date}}
             </f7-block>
         </template>
 
         <template v-if="viewing_self">
             <f7-block-title>Balance</f7-block-title>
-            <f7-block>
+            <f7-block inner>
                 <f7-preloader v-if="balance_loading" size="24px" color="gray"></f7-preloader>
                 {{user_balance}}
             </f7-block>
