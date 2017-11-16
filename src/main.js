@@ -35,6 +35,9 @@ require.ensure([], function() {
 window.isMaterial = !window.Framework7.prototype.device.ios;
 window.isiOS = window.Framework7.prototype.device.ios;
 
+// TODO later: use proper state managment instead of a global event bus
+window.timebank_event_bus = new Vue();
+
 // Import F7 iOS Theme Styles
 /* eslint-disable global-require */
 if (window.isiOS) {

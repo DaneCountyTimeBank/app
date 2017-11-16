@@ -6,7 +6,7 @@
       </f7-nav-center>
     </f7-navbar>
 
-    <f7-block class="center-preloader" v-if="!loaded">
+    <f7-block class="center-preloader" v-if="!loaded && !load_error">
         <f7-preloader></f7-preloader>
     </f7-block>
     <f7-block v-if="load_error">
@@ -75,7 +75,7 @@
 
 <style>
 
-/* TODO: extract b/c common style.. or make center-preloader a component.. */
+/* TODO later: extract b/c common style.. or make center-preloader a component.. */
 .center-preloader {
     text-align: center;
 }

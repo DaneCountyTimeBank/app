@@ -15,55 +15,67 @@
 
     <template v-if="!load_error && loaded">
 
-    <f7-block v-if="post_id">
-        <template v-if="earned">
-            You are taking payment from 
-        </template>
-        <template v-if="spent">
-            You are paying
-        </template>
-        <a :href="user_id | profile_link">{{user_name}}</a>
-        for "<a :href="post_id | post_link">{{description}}</a>".
-    </f7-block>
-
-    <f7-list form>
-      <template v-if="!post_id">
+    <template v-if="post_id">
+        <f7-block>
+            <template v-if="earned">
+                You are taking payment from 
+            </template>
+            <template v-if="spent">
+                You are paying
+            </template>
+            <a :href="user_id | profile_link">{{user_name}}</a>
+            for "<a :href="post_id | post_link">{{description}}</a>".
+        </f7-block>
+        <f7-list form>
+          <f7-list-item>
+            <f7-label>Hours</f7-label>
+            <f7-input v-model.trim="hours" type="text" placeholder="eg. 1:45"/>
+          </f7-list-item>
+          <f7-list-item>
+            <f7-label>Date</f7-label>
+            <improved-datepicker v-model="date" :max-date="max_date"></improved-datepicker>
+          </f7-list-item>
+          <f7-list-item v-if="display_categories && loaded && !category_ids_preloaded" smart-select title="Categories" class="display-categories-select">
+            <improved-select v-model="category_ids" :options="display_categories"></improved-select>
+          </f7-list-item>
+          <f7-list-item>
+            <f7-button @click="submitExchange" class="button button-fill button-raised">Submit</f7-button>
+          </f7-list-item>
+        </f7-list>
+    </template> <!-- form duplicated partially above b/c the description-hint below makes it hack to style the below form to appear like the above -->
+    <template v-else>
+        <f7-list form>
           <f7-list-item v-model="exchange_type" radio name="exchange-type" value="earned" input-value="earned" title="I earned"></f7-list-item>
           <f7-list-item v-model="exchange_type" radio name="exchange-type" value="spent" input-value="spent" title="I spent"></f7-list-item>
-      </template>
-
-      <f7-list-item>
-        <f7-label>Hours</f7-label>
-        <f7-input v-model.trim="hours" type="text" placeholder="eg. 1:45"/>
-      </f7-list-item>
-
-      <f7-list-item v-if="!post_id">
-        <f7-label>Describe the exchange</f7-label>
-        <f7-input v-model.trim="description" :disabled="!custom" type="text" placeholder="" maxlength="255" />
+          <f7-list-item>
+            <f7-label>Hours</f7-label>
+            <f7-input v-model.trim="hours" type="text" placeholder="eg. 1:45"/>
+          </f7-list-item>
+          <f7-list-item>
+            <f7-label>Description</f7-label>
+            <f7-input v-model.trim="description" :disabled="!custom" type="text" placeholder="" maxlength="255" />
+          </f7-list-item>
+        </f7-list>
         <div class="description-hint">
             Don't include names in your description as this information will be made public.
         </div>
-      </f7-list-item>
-
-      <f7-list-item v-if="!post_id">
-        <f7-label>With</f7-label>
-        <f7-input v-model="user_name" :disabled="true" type="text" placeholder=""/>
-      </f7-list-item>
-
-      <f7-list-item>
-        <f7-label>Date</f7-label>
-        <improved-datepicker v-model="date" :max-date="max_date"></improved-datepicker>
-      </f7-list-item>
-
-      <f7-list-item v-if="display_categories && loaded && !category_ids_preloaded" smart-select title="Categories" class="display-categories-select">
-        <improved-select v-model="category_ids" :options="display_categories"></improved-select>
-      </f7-list-item>
-
-      <f7-list-item>
-        <f7-button @click="submitExchange" class="button button-fill button-raised">Submit</f7-button>
-      </f7-list-item>
-
-    </f7-list>
+        <f7-list form>
+          <f7-list-item>
+            <f7-label>With</f7-label>
+            <f7-input v-model="user_name" :disabled="true" type="text" placeholder=""/>
+          </f7-list-item>
+          <f7-list-item>
+            <f7-label>Date</f7-label>
+            <improved-datepicker v-model="date" :max-date="max_date"></improved-datepicker>
+          </f7-list-item>
+          <f7-list-item v-if="display_categories && loaded && !category_ids_preloaded" smart-select title="Categories" class="display-categories-select">
+            <improved-select v-model="category_ids" :options="display_categories"></improved-select>
+          </f7-list-item>
+          <f7-list-item>
+            <f7-button @click="submitExchange" class="button button-fill button-raised">Submit</f7-button>
+          </f7-list-item>
+        </f7-list>
+    </template>
 
     <f7-actions :opened="exchange_recorded">
       <f7-actions-group>
@@ -106,7 +118,7 @@
                 hours: '',
                 description: '',
                 exchange_type: '',
-                user_name: user_name || 'Member ' + user_id,
+                user_name: user_name || ('Member ' + user_id),
                 spent: false,
                 earned: false,
                 category_ids: [],
@@ -474,9 +486,11 @@
 <style>
 
 .description-hint {
+    margin: -22px 0;
+    margin-top: -30px;
+    padding: 0 16px;
+
     font-size: 12px;
-    margin-top: 6px;
-    margin-bottom: 8px;
     color: #8c2762;
     font-style: italic;
 }

@@ -10,44 +10,56 @@
     </f7-navbar>
     <!-- Scrollable page content-->
 
-    <f7-block-title>News</f7-block-title>
-
+    <f7-block-title>
+        News
+    </f7-block-title>
     <f7-preloader v-if="stories_loading" size="24px" color="gray"></f7-preloader>
-    <f7-list media-list>
-        <f7-list-item v-for="item in stories" :link="item | story_link" @click="selectStory(item)">
-            <div class="item-title-row">
-                <div class="item-title">
-                    {{item.title}}
-                </div>
-            </div>
-            <div class="item-text">
-                {{item.created | timestamp_to_date}}
-            </div>
-        </f7-list-item>
-
-    </f7-list>
-
-    <f7-block-title>Events</f7-block-title>
-
-    <f7-preloader v-if="events_loading" size="24px" color="gray"></f7-preloader>
-    <f7-list media-list>
-        <f7-list-item v-for="item in events" :link="item | event_link" @click="selectEvent(item)">
-            <div class="item-title-row">
-                <div class="item-title">
-                    {{item.title}}
-                </div>
-            </div>
-            <div class="item-text">
-                {{item.date | timestamp_to_date}}<br />
-                {{item.date | timestamp_to_time}}
-            </div>
-        </f7-list-item>
-
-    </f7-list>
-
-    <f7-block inner v-if="!events_loading && events.length === 0">
-        <p>No upcoming events.</p>
+    <f7-block v-if="stories_error">
+        Error loading news.
     </f7-block>
+    <template v-if="!stories_loading && !stories_error">
+        <f7-list media-list v-if="stories.length !== 0">
+            <f7-list-item v-for="item in stories" :link="item | story_link" @click="selectStory(item)">
+                <div class="item-title-row">
+                    <div class="item-title">
+                        {{item.title}}
+                    </div>
+                </div>
+                <div class="item-text">
+                    {{item.created | timestamp_to_date}}
+                </div>
+            </f7-list-item>
+        </f7-list>
+        <f7-block inner v-if="stories.length === 0">
+            <p>No news available.</p>
+        </f7-block>
+    </template>
+
+    <f7-block-title>
+        Events
+    </f7-block-title>
+    <f7-preloader v-if="events_loading" size="24px" color="gray"></f7-preloader>
+    <f7-block v-if="events_error">
+        Error loading events.
+    </f7-block>
+    <template v-if="!events_loading && !events_error">
+        <f7-list media-list v-if="events.length !== 0">
+            <f7-list-item v-for="item in events" :link="item | event_link" @click="selectEvent(item)">
+                <div class="item-title-row">
+                    <div class="item-title">
+                        {{item.title}}
+                    </div>
+                </div>
+                <div class="item-text">
+                    {{item.date | timestamp_to_date}}<br />
+                    {{item.date | timestamp_to_time}}
+                </div>
+            </f7-list-item>
+        </f7-list>
+        <f7-block inner v-if="events.length === 0">
+            <p>No upcoming events.</p>
+        </f7-block>
+    </template>
 
 
     <f7-block-title>Links</f7-block-title>
@@ -73,8 +85,10 @@
                 title: 'Home Page',
                 stories: [],
                 stories_loading: true,
+                stories_error: false,
                 events: [],
                 events_loading: true,
+                events_error: false,
             };
         },
 
@@ -96,35 +110,21 @@
 
         created () {
 
-            // TODO: prevent this from running until the page is loaded.. currently runs on any first page load
-
-            var self = this;
-
-            Timebank.get_stories(3, function(stories){
-                // success
-                self.stories_loading = false;
-                self.stories = stories;
-
-            }, function(){
-                // error
-
-                // TODO:
-
-            });
-            Timebank.get_events({start: 0, num: 3}, function(data){
-
-                // success
-                self.events_loading = false;
-                self.events = data.events;
-
-            }, function(){
-                // error
-
-                // TODO:
-
+            Timebank.get_stories(3, stories => {
+                this.stories_loading = false;
+                this.stories = stories;
+            }, () => {
+                this.stories_error = true;
             });
 
-            // TODO: add a projects page and show projects
+            Timebank.get_events({start: 0, num: 3}, data => {
+                this.events_loading = false;
+                this.events = data.events;
+            }, () => {
+                this.events_error = true;
+            });
+
+            // TODO later: add a projects page and show projects
             //Timebank.get_projects();
         }
 

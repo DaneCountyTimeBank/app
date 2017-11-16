@@ -1,8 +1,8 @@
 <template>
 
   <f7-page name="posts" pull-to-refresh @ptr:refresh="onPullToRefresh" :pull-to-refresh-distance="44" >
-    <f7-navbar sliding :back-link="exchange && 'Back'">
-      <f7-nav-left v-if="!exchange">
+    <f7-navbar sliding :back-link="user_id && 'Back'">
+      <f7-nav-left v-if="!user_id">
         <f7-link icon="icon-bars" open-panel="left"></f7-link>
       </f7-nav-left>
       <f7-nav-center>
@@ -16,9 +16,9 @@
       </f7-nav-right>
     </f7-navbar>
 
-    <f7-block-title v-if="user_id" class="showing-posts-header">
+    <f7-block v-if="user_id" class="showing-posts-header">
         Showing posts by <template v-if="exchange">you and </template><strong><a :href="user_id | member_link">{{user_name}}</a></strong>
-    </f7-block-title>
+    </f7-block>
 
     <!-- TODO later: extract to a component -->
     <f7-list form class="posts-search-form">
@@ -320,7 +320,8 @@
 }
 
 .showing-posts-header {
-    margin-top: 0 !important;
+    margin-top: 15px !important;
+    margin-bottom: 15px !important;
 }
 
 .post-list {

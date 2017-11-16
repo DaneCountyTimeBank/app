@@ -1,7 +1,8 @@
 <template>
   <f7-panel left :reveal="isiOS" :cover="isMaterial">
-    <f7-navbar title="Menu"></f7-navbar>
+    <f7-navbar :title="logged_in ? 'Menu' : ''"></f7-navbar>
     <f7-page>
+      <template v-if="logged_in">
       <f7-block-title>Links</f7-block-title>
       <f7-list>
         <f7-list-item
@@ -68,14 +69,15 @@
           link-close-panel
         />
         <f7-list-item
-          @click="logout"
-          link="/login"
+          @click.prevent.stop="logout"
+          link="#"
           title="Logout"
           link-view="#main-view"
           link-reload
           link-close-panel
         />
       </f7-list>
+      </template>
     </f7-page>
   </f7-panel>
 </template>
@@ -88,27 +90,48 @@
     data () {
       return {
         isMaterial: window.isMaterial,
-        isiOS: window.isiOS
+        isiOS: window.isiOS,
+        logged_in: localStorage.user_id
       };
     },
 
+    created () {
+        // TODO later: use proper state managment instead of a global event bus
+        window.timebank_event_bus.$on('login', () => {
+            this.logged_in = true;
+        });
+        window.timebank_event_bus.$on('logout', () => {
+            this.logged_in = false;
+        });
+    },
+
     methods: {
+
+        // TODO later: provide menu, links & functionality (eg. contact form) for logged out users
+
+        logoutSuccess () {
+            delete localStorage.user_id;
+            window.timebank_event_bus.$emit('logout');
+
+            // XXX: need to reference router this way when the component could be loaded w/o a hash path being set
+            //      (eg. any component referenced from App.vue)
+            this.$f7.mainView.router.load({url: '/login'});
+        },
+
         logout () {
-            //var self = this;
-            
-            Timebank.logout(function(){
-                // success
+            this.$f7.closePanel();
+            this.$f7.showPreloader('Logging out..');
 
-                //self.$root.user_id = null;
-                delete localStorage.user_id;
-
-                // TODO: only show login page on success..
-
-            }, function(){
-                // error
-
-                // TODO: show error messages
-
+            Timebank.logout(() => {
+                this.$f7.hidePreloader();
+                this.logoutSuccess();
+            }, (status, message) => {
+                this.$f7.hidePreloader();
+                if (message.indexOf('User is not logged in.') > -1) {
+                    this.logoutSuccess();
+                } else {
+                    this.$f7.addNotification({message: 'Error logging out - please try again later.', hold: 3500});
+                }
             });
         }
     }

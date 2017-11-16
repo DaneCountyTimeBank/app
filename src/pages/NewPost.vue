@@ -1,7 +1,7 @@
 <template>
   <f7-page name="newpost">
-    <f7-navbar sliding>
-      <f7-nav-left>
+    <f7-navbar sliding :back-link="edit_post_id && 'Back'">
+      <f7-nav-left v-if="!edit_post_id">
         <f7-link icon="icon-bars" open-panel="left"></f7-link>
       </f7-nav-left>
       <f7-nav-center>
@@ -9,7 +9,14 @@
       </f7-nav-center>
     </f7-navbar>
 
-    <f7-list form>
+    <f7-block class="center-preloader" v-if="!loaded && !load_error">
+        <f7-preloader></f7-preloader>
+    </f7-block>
+    <f7-block v-if="load_error">
+        Error loading - please try again later.
+    </f7-block>
+
+    <f7-list form v-if="loaded && !load_error">
       <f7-list-item group-title title="I am.."></f7-list-item>
       <f7-list-item v-model="post_type" radio name="offer-want" value="offer" input-value="offer" title="Offering"></f7-list-item>
       <f7-list-item v-model="post_type" radio name="offer-want" value="want" input-value="want" title="Requesting"></f7-list-item>
@@ -73,6 +80,8 @@
                 end_time_ms = year_from_now_ms,
 
                 defaults = {
+                    edit_post_id: edit_post_id,
+
                     title: edit_post_id ? 'Edit Post' : 'New Post',
                     display_categories: null,
                     min_date: new Date(), // don't allow selecting a date before today
@@ -88,6 +97,9 @@
                     edit_post: null,
                     submitted_text: edit_post_id ? 'Post updated!' : 'Post submitted!',
                     submitted_hide_text: edit_post_id ? 'Continue editing' : 'New Post',
+                    edit_post_loaded: false,
+                    post_categories_loaded: false,
+                    load_error: false,
                 };
 
             if (edit_post_id) {
@@ -248,34 +260,40 @@
 
         },
 
-        created () {
-            var edit_post_id = this.$route.params.post_id,
-                edit_post = this.$root.post;
+        computed: {
+            loaded () {
+                return this.edit_post_loaded && this.post_categories_loaded;
+            }
+        },
 
-            if (edit_post_id && !edit_post) {
+        created () {
+            var edit_post = this.$root.post;
+
+            // XXX: for deleting jdrupal cache of nodes, run:
+            //      for (var prop in localStorage) { if (prop.indexOf('node_') > -1) { delete localStorage[prop]; } }z
+
+            if (this.edit_post_id && !edit_post) {
                 Timebank.get_post(
-                    edit_post_id,
+                    this.edit_post_id,
                     edit_post => {
                         this.setEditPost(edit_post, this);
+                        this.edit_post_loaded = true;
                     },
                     (status, msg) => {
-
-                        // TODO: handle error loading and show can't edit post right now message & prevent form from showing
-
+                        this.load_error = true;
                     }
                 );
+            } else {
+                this.edit_post_loaded = true;
             }
 
             Timebank.get_post_categories(display_categories => {
 
                 this.display_categories = display_categories;
+                this.post_categories_loaded = true;
 
             }, (status, msg) => {
-                this.$f7.addNotification({message: 'Error loading categories, please try again later.', hold: 3500});
-
-                // TODO: hopefully rare but may want to disable the new post form if this does happen
-                //      so people don't fill it out..
-                
+                this.load_error = true;
             });
         }
 

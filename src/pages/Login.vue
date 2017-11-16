@@ -5,7 +5,6 @@
         Dane County TimeBank
       </f7-nav-center>
     </f7-navbar>
-    <!-- Scrollable page content-->
 
     <f7-block-title>Login</f7-block-title>
 
@@ -67,36 +66,49 @@
 
             login () {
 
-                var self = this;
+                this.$f7.showPreloader('Logging in..');
 
-                self.$f7.showPreloader('Logging in..');
+                Timebank.login(
+                    this.email,
+                    this.password,
+                    user_id => {
+                        localStorage.user_id = user_id;
+                        window.timebank_event_bus.$emit('login');
 
-                Timebank.login(this.email, this.password, function(user_id){
+                        this.$f7.hidePreloader();
 
-                    localStorage.user_id = user_id;
-                    //self.$root.user_id = user_id;
+                        // TODO later: use a different router that uses pushState to get better URLs..
+                        //             but then would have to have Apache know to load a specific page for a given url..
 
-                    self.$f7.hidePreloader();
-
-                    self.$router.load({url: '/home'});
-
-                }, function(status, message){
-                    
-                    self.$f7.hidePreloader();
-
-                    var err;
-                    if (message.indexOf('Wrong username or password') > -1 || message.indexOf('bad input') > -1) {
-                        err = 'Error - wrong email or password.';
-                    } else if (message.indexOf('Already logged in') > -1) {
-                        // assume they are logged into their own account..
-                        self.$router.load({url: '/home'});
-                    } else {
-                        err = 'Uknown error - please try again later.';
+                        // XXX: need to reference router this way when the component could be loaded w/o a hash path being set
+                        //      (eg. any component referenced from App.vue)
+                        this.$f7.mainView.router.load({url: '/home'});
+                    },
+                    (status, message) => {
+                        var err;
+                        if (message.indexOf('Wrong username or password') > -1 || message.indexOf('bad input') > -1) {
+                            this.$f7.hidePreloader();
+                            err = 'Error - wrong email or password.';
+                        } else if (message.indexOf('Already logged in') > -1) {
+                            // may be logged into a different account
+                            // so logout before logging in
+                            Timebank.logout(() => {
+                                delete localStorage.user_id;
+                                this.$f7.hidePreloader();
+                                this.login();
+                            }, (status, msg) => {
+                                this.$f7.hidePreloader();
+                                this.$f7.addNotification({message: 'Unknown error - please try again later.', hold: 3500});
+                            });
+                        } else {
+                            this.$f7.hidePreloader();
+                            err = 'Uknown error - please try again later.';
+                        }
+                        if (err) {
+                            this.$f7.addNotification({message: err, hold: 3500});
+                        }
                     }
-                    if (err) {
-                        self.$f7.addNotification({message: err, hold: 3500});
-                    }
-                });
+                );
             },
 
         }

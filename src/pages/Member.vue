@@ -9,7 +9,7 @@
       </f7-nav-center>
     </f7-navbar>
     
-    <f7-block class="center-preloader" v-if="!loaded">
+    <f7-block class="center-preloader" v-if="!loaded && !load_error">
         <f7-preloader></f7-preloader>
     </f7-block>
     <f7-block v-if="load_error">
@@ -36,7 +36,7 @@
                         {{user.location.area}}<br />
                     </template>
 
-                    {{user.location.city}}<template v-if="user.location.postal_code">, {{user.location.postal_code}}</template>
+                    {{user.location.city}}<template v-if="user.location.postal_code"><template v-if="user.location.city">,</template> {{user.location.postal_code}}</template>
                     <br />
                 </template>
             </f7-block>

@@ -43,14 +43,17 @@ function sc() {
 */
 
 function logout(success, error) {
-    user_logout(success, error);
+    user_logout({
+        success: success,
+        error: function(xhr, status, msg) {
+            if (error) error(status, msg);
+        }
+    });
 }
 
 function login(username_or_email, password, success, error) {
-    log('login');
     user_login(username_or_email, password, {
         success: function(result) {
-            log('login user', result.user);
             if (success) success(result.user.uid); // could pass the whole user.. but if I do will want it to be the same format as get_user returns
         },
         error: function(xhr, status, message) {
@@ -537,8 +540,8 @@ function send_msg(args, success, error) {
 
 function send_site_msg(args, success, error) {
 
-    // TODO: probably need to remove captcha before using this w/ logged out users
-    //       doesn't work b/c captcha on site contact form requires submitting what code is in the image..
+    // TODO later: probably need to remove captcha before using this w/ logged out users
+    //             doesn't work b/c captcha on site contact form requires submitting what code is in the image..
 
     // args should have {name, email, subject, message}
 
@@ -936,6 +939,8 @@ function get_nodes(type, num, success, error) {
 function get_projects(num, success, error) {
     return get_nodes('projects', num, success, error);
 }
+
+//window.get_projects = get_projects;
 
 /*
 function unix_time() {

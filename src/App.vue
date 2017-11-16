@@ -23,7 +23,8 @@
         <!-- Pages-->
         <f7-pages>
           <!-- Page, data-page contains page name-->
-          <home-page />
+          <home-page v-if="logged_in" />
+          <login-page v-else />
         </f7-pages>
       </f7-view>
     </f7-views>
@@ -33,12 +34,19 @@
 <script>
   import LeftPanel from './components/LeftPanel';
   import Home from './pages/Home';
+  import Login from './pages/Login';
 
   export default {
     name: 'App',
+    data () {
+        return {
+            logged_in: localStorage.user_id
+        };
+    },
     components: {
       'left-panel-view': LeftPanel,
-      'home-page': Home
+      'home-page': Home,
+      'login-page': Login
     },
     computed: {
       isiOS () {

@@ -201,6 +201,7 @@
 
             },
             submitPayment (post) {
+                this.$root.view_user_name = post.user_name;
                 this.$root.post = post;
             },
             editPost () {

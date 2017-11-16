@@ -2803,7 +2803,7 @@ function user_login(name, pass, options) {
           try {
             // Now that we are logged in, we need to get a new CSRF token, and
             // then make a system connect call.
-            console.log('JDRUPAL setting Drupal.user to', data.user, 'other data', data);
+            //console.log('JDRUPAL setting Drupal.user to', data.user, 'other data', data);
             Drupal.user = data.user;
             
             Drupal.sessid = null;
