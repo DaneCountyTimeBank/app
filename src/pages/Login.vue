@@ -1,10 +1,12 @@
 <template>
   <f7-page name="login">
     <f7-navbar sliding>
-      <f7-nav-center>
-        Dane County TimeBank
-      </f7-nav-center>
+      <f7-nav-center>Dane County TimeBank</f7-nav-center>
     </f7-navbar>
+
+    <f7-block inner class="login-img">
+        <img src="static/dctb_logo.png" alt="Dane County TimeBank" width="140" height="140" />
+    </f7-block>
 
     <f7-block-title>Login</f7-block-title>
 
@@ -24,26 +26,30 @@
 
     </f7-list>
 
-    <f7-block-title>Not a member yet?</f7-block-title>
-
-    <f7-block inner>
-        <p>
-            TimeBank members are a caring and interconnected community of people who help each other by sharing their abilities, talents, and experiences.
-            <br /><br />
-            As a TimeBank member, you can provide services for other members and you will earn one TimeBank Hour for each hour you spend providing the service – everyone’s time and talents are valued equally. 
-            <br /><br />
-            You can then exchange each TimeBank Hour you've earned for an hour of service from another TimeBank member.
-            <br /><br />
-            <strong>To join the Dane County TimeBank</strong>, 
-            email <f7-link external  href="mailto:join@danecountytimebank.org?subject=Joining%20Dane%20County%20TimeBank">join@danecountytimebank.org</f7-link>
-            or call <f7-link external href="tel:6086630400">(608) 663-0400</f7-link>
-        </p>
-    </f7-block>
     <!--
-    based on:
-    https://danecountytimebank.org/
-    https://danecountytimebank.org/join
+
+    TODO: need a forgot your password option
+
     -->
+
+    <f7-block-title>Not a member yet?</f7-block-title>
+    <f7-block inner>
+        TimeBank members are a caring and interconnected community of people who help each other by sharing their abilities, talents, and experiences.
+        <br /><br />
+        As a TimeBank member, you can provide services for other members and you will earn one TimeBank Hour for each hour you spend providing the service – everyone’s time and talents are valued equally. 
+        <br /><br />
+        You can then exchange each TimeBank Hour you've earned for an hour of service from another TimeBank member.
+
+        <br /><br />
+        <strong>To join the Dane County TimeBank</strong>, 
+        <f7-link external  href="mailto:join@danecountytimebank.org?subject=Joining%20Dane%20County%20TimeBank">email us</f7-link>
+        or call <f7-link external href="tel:6086630400">(608) 663-0400</f7-link>
+    </f7-block>
+
+    <f7-block-title>Contact Us</f7-block-title>
+    <f7-block inner>
+        For general information or help, please <f7-link external href="mailto:info@danecountytimebank.org">email us</f7-link> or call our office number at <f7-link external href="tel:6086630400">(608) 663-0400</f7-link>.
+    </f7-block>
 
   </f7-page>
 </template>
@@ -117,6 +123,14 @@
 
 <style>
 
-
+.login-img {
+    text-align:center;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+.login-img .content-block-inner {
+    padding-top: 0;
+    padding-bottom: 0;
+}
 
 </style>

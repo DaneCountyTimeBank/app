@@ -42,6 +42,10 @@ function sc() {
 }
 */
 
+function get_site_path() {
+    return SITE_PATH;
+}
+
 function logout(success, error) {
     user_logout({
         success: success,
@@ -677,7 +681,7 @@ function get_post_categories(success, error) {
             for (var i = 0; i < terms.length; ++i) {
                 CATEGORIES[terms[i].tid] = terms[i].name;
             }
-            log('got post categories', CATEGORIES);
+            //log('got post categories', CATEGORIES);
             localStorage.post_categories = JSON.stringify(CATEGORIES);
             if (success) success(_post_categories_sorted(CATEGORIES));
             //log('Loaded ' + terms.length + ' term(s)!', terms); // each one has tid & name
@@ -1157,6 +1161,8 @@ module.exports = {
     hours_to_hour_minute_display: hours_to_hour_minute_display,
 
     //cleanup_html: cleanup_html,
+
+    get_site_path: get_site_path,
 
 };
 

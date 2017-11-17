@@ -3,7 +3,7 @@
     <f7-navbar :title="logged_in ? 'Menu' : ''"></f7-navbar>
     <f7-page>
       <template v-if="logged_in">
-      <f7-block-title>Links</f7-block-title>
+      <!-- <f7-block-title>Links</f7-block-title> -->
       <f7-list>
         <f7-list-item
           link="/home"

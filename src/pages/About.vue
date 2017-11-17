@@ -11,22 +11,48 @@
     <!-- Scrollable page content-->
     <f7-block-title>{{ title }}</f7-block-title>
     <f7-block inner>
+        TimeBank members are a caring and interconnected community of people who help each other by sharing their abilities, talents, and experiences.
+        <br /><br />
+        As a TimeBank member, you can provide services for other members and you will earn one TimeBank Hour for each hour you spend providing the service – everyone’s time and talents are valued equally. 
+        <br /><br />
+        You can then exchange each TimeBank Hour you've earned for an hour of service from another TimeBank member.
+    </f7-block>
+    <f7-block-title>Contacts</f7-block-title>
+    <f7-block inner class="staff-details">
+        For general information, please <f7-link external href="mailto:info@danecountytimebank.org">email our staff</f7-link> or call our office number at <f7-link external href="tel:6086630400">(608) 663-0400</f7-link>.
+        <br /><br />
+        To contact staff with more urgent needs, please use the contact details listed below.
+        <br /><br />
 
-    <p>
-        <strong>
-        Increasing efficiency, opportunity, and resource sharing through mutually beneficial exchange -
-        Building community ties and self-sufficiency for individuals and organizations in Dane County.
-        </strong>
-    </p>
-    <p>
-        The Dane County TimeBank (DCTB), established in 2005, is a network of over 2500 individuals and organizations who exchange services and skills to build community, build capacity, and come together to help each other to build a better world. In timebanking, everyone's contribution is valued equally - one hour equals one hour - and services exchanged help to fill resource gaps in the community. Anyone can join the TimeBank to offer skill or services - and receive services in exchange.
-    </p>
-    <p>
-        The Dane County TimeBank has become a valuable tool to build programs that help solve challenges identified by the community - collaborating with community partners Dane County Human Services, Madison School District, and other supporters and participants to connect unmet needs with unused resources. Our projects provide meaningful ways for members to tap into to the network and offer needed skills and services.
-    </p>
-    <p>
-        In addition to our local efforts, Time for the World is a project of the Dane County TimeBank working to build a world-wide cooperative network – Mutual Aid Networks – connecting timebanking with other cooperative practice to spread a generative community economy.
-    </p>
+        <template v-for="role in staff">
+            <strong>{{role.title}}</strong><br />
+            <template v-for="person in role.people">
+                {{person.name}}
+                &nbsp; <f7-link v-if="person.email" external :href="'mailto:' + person.email"><i class="material-icons">email</i></f7-link>
+                &nbsp; <f7-link v-if="person.phone" external :href="'tel:' + person.phone"><i class="material-icons">phone</i></f7-link>
+                <br />
+            </template>
+            <br />
+        </template>
+
+    </f7-block>
+    <f7-block-title>Address</f7-block-title>
+    <f7-block inner>
+        Dane County TimeBank<br />
+        1202 Williamson St. Suite 107<br />
+        Madison, WI 53703<br />
+        <f7-link external href="tel:6086630400">(608) 663-0400</f7-link>
+    </f7-block>
+
+    <!--
+
+        TODO later: add projects - https://danecountytimebank.org/projects
+        TODO even later: board of directors maybe
+
+        TODO later: make a faq page just for the app based on questions received about the app..
+                    pull from desktop site faq some things (eg. liability/safeting/screening info)
+
+    -->
 
     </f7-block>
   </f7-page>
@@ -37,8 +63,72 @@
     name: 'About',
     data () {
       return {
-        title: 'Dane County TimeBank'
+        title: 'Dane County TimeBank',
+        staff: [
+            // <i class="material-icons color-darkgreen">email</i> &nbsp; <i class="material-icons color-darkgreen">phone</i>
+            {
+                title: 'Executive Director',
+                people: [
+                    {name: 'Lorrie Hurckes Dwyer', email: 'lorrie@danecountytimebank.org'}
+                ]
+            },
+            {
+                title: 'Community Outreach Coordinator',
+                people: [
+                    {name: 'Gary Messinger', email: 'gary@danecountytimebank.org', phone: '6086307742'}
+                ]
+            },
+            {
+                title: 'Sun Prairie Neighborhood Coordinator',
+                people: [
+                    {name: 'Amy Anderson', email: 'amy@danecountytimebank.org'}
+                ]
+            },
+            {
+                title: 'Youth Court Coordinators',
+                people: [
+                    {name: 'Brittany McKennie', email: 'brittany@danecountytimebank.org'},
+                    {name: 'Tierra Merritt', email: 'tierra@danecountytimebank.org'},
+                    {name: 'Alexis Gardner', email: 'alexis@danecountytimebank.org'},
+                ]
+            },
+            {
+                title: 'Transportation Coordinator',
+                people: [
+                    {name: 'Bunny Brzezinski', email: 'transportation@danecountytimebank.org'}
+                ]
+            },
+            {
+                title: 'Bookkeeper',
+                people: [
+                    {name: 'Jerry Chernow', email: 'finance@danecountytimebank.org'}
+                ]
+            },
+            {
+                title: 'Development Director',
+                people: [
+                    {name: 'Bruce Moffat', email: 'moffat.bruce@gmail.com'}
+                ]
+            },
+            {
+                title: 'Founder',
+                people: [
+                    {name: 'Stephanie Rearick', email: 'steph@stephanierearick.com'}
+                ]
+            }
+        ]
       };
     }
   };
 </script>
+
+<style>
+
+.staff-details i {
+    vertical-align: middle;
+}
+.staff-details i {
+    color: #80a8d4;
+}
+
+</style>

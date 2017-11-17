@@ -181,7 +181,7 @@ user.login = "1487805566"
             },
             posts_link: user => `/posts?user_id=${user.user_id}`,
             message_link: user => `/member/${user.user_id}/message`,
-            edit_account_link: user => `https://danecountytimebank.org/user/${user.user_id}/account/profile`,
+            edit_account_link: user => Timebank.get_site_path() + `/user/${user.user_id}/account/profile`,
         },
         methods: {
             setViewUserName () {
