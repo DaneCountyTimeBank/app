@@ -5,7 +5,7 @@
         <f7-link icon="icon-bars" open-panel="left"></f7-link>
       </f7-nav-left>
       <f7-nav-center>
-        Home
+        Dane County TimeBank
       </f7-nav-center>
     </f7-navbar>
     <!-- Scrollable page content-->
@@ -38,7 +38,7 @@
     <f7-block-title>
         Events
     </f7-block-title>
-    <f7-preloader v-if="events_loading" size="24px" color="gray"></f7-preloader>
+    <f7-preloader v-if="events_loading && !events_error" size="24px" color="gray"></f7-preloader>
     <f7-block v-if="events_error">
         Error loading events.
     </f7-block>
@@ -64,7 +64,7 @@
 
     <f7-block-title>Links</f7-block-title>
     <f7-list>
-        <f7-list-item link="/post" title="New Post"></f7-list-item>
+        <f7-list-item link="/post" title="List Offer / Request"></f7-list-item>
         <f7-list-item link="/offers" title="Offers"></f7-list-item>
         <f7-list-item link="/requests" title="Requests"></f7-list-item>
         <f7-list-item link="/members/exchange" title="Record an Exchange"></f7-list-item>
