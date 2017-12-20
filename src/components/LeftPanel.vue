@@ -5,77 +5,93 @@
       <template v-if="logged_in">
       <!-- <f7-block-title>Links</f7-block-title> -->
       <f7-list>
-        <f7-list-item
-          link="/home"
-          title="Home"
-          link-view="#main-view"
-          link-reload
-          link-close-panel
-        />
-        <f7-list-item
-          link="/post"
-          title="New Post"
-          link-view="#main-view"
-          link-reload
-          link-close-panel
-        />
-        <f7-list-item
-          link="/offers"
-          title="Offers"
-          link-view="#main-view"
-          link-reload
-          link-close-panel
-        />
-        <f7-list-item
-          link="/requests"
-          title="Requests"
-          link-view="#main-view"
-          link-reload
-          link-close-panel
-        />
-        <f7-list-item
-          link="/members/exchange"
-          title="Record an Exchange"
-          link-view="#main-view"
-          link-reload
-          link-close-panel
-        />
-        <f7-list-item
-          link="/member/me"
-          title="Your Account"
-          link-view="#main-view"
-          link-reload
-          link-close-panel
-        />
-        <f7-list-item
-          link="/members"
-          title="Members"
-          link-view="#main-view"
-          link-reload
-          link-close-panel
-        />
-        <f7-list-item
-          link="/about"
-          title="About"
-          link-view="#main-view"
-          link-reload
-          link-close-panel
-        />
-        <f7-list-item
-          link="/feedback"
-          title="Feedback"
-          link-view="#main-view"
-          link-reload
-          link-close-panel
-        />
-        <f7-list-item
-          @click.prevent.stop="logout"
-          link="#"
-          title="Logout"
-          link-view="#main-view"
-          link-reload
-          link-close-panel
-        />
+        <f7-list-group>
+            <f7-list-item title="" group-title></f7-list-item>
+            <f7-list-item
+              link="/home"
+              title="Home"
+              link-view="#main-view"
+              link-reload
+              link-close-panel
+            />
+            <!-- <li class="item-divider"></li> -->
+        </f7-list-group>
+        <f7-list-group>
+            <f7-list-item title="" group-title></f7-list-item>
+            <f7-list-item
+              link="/post"
+              title="List Offer / Request"
+              link-view="#main-view"
+              link-reload
+              link-close-panel
+            />
+            <f7-list-item
+              link="/offers"
+              title="Offers"
+              link-view="#main-view"
+              link-reload
+              link-close-panel
+            />
+            <f7-list-item
+              link="/requests"
+              title="Requests"
+              link-view="#main-view"
+              link-reload
+              link-close-panel
+            />
+            <f7-list-item
+              link="/members/exchange"
+              title="Record an Exchange"
+              link-view="#main-view"
+              link-reload
+              link-close-panel
+            />
+        </f7-list-group>
+        <f7-list-group>
+            <f7-list-item title="" group-title></f7-list-item>
+            <f7-list-item
+              link="/members"
+              title="Members"
+              link-view="#main-view"
+              link-reload
+              link-close-panel
+            />
+        </f7-list-group>
+        <f7-list-group>
+            <f7-list-item title="" group-title></f7-list-item>
+            <f7-list-item
+              link="/member/me"
+              title="Your Account"
+              link-view="#main-view"
+              link-reload
+              link-close-panel
+            />
+        </f7-list-group>
+        <f7-list-group>
+            <f7-list-item title="" group-title></f7-list-item>
+            <f7-list-item
+              link="/about"
+              title="About"
+              link-view="#main-view"
+              link-reload
+              link-close-panel
+            />
+            <f7-list-item
+              link="/feedback"
+              title="Feedback"
+              link-view="#main-view"
+              link-reload
+              link-close-panel
+            />
+            <f7-list-item
+              @click.prevent.stop="logout"
+              link="#"
+              title="Logout"
+              link-view="#main-view"
+              link-reload
+              link-close-panel
+            />
+        </f7-list-group>
       </f7-list>
       </template>
     </f7-page>
@@ -106,6 +122,11 @@
     },
 
     methods: {
+
+        // TODO: invite a friend to join functionality (social media & email options)
+        // TODO: become a trained onboarder / coordinator functionality
+
+        // TODO later: add icons to these links
 
         // TODO later: provide menu, links & functionality (eg. contact form) for logged out users
 
@@ -150,4 +171,16 @@
       border-right: 1px solid #b2b2b2;
     }
   }
+
+  .list-group-title {
+    height: 16px;
+  }
+  .android .list-block {
+    margin-top: 5px;
+  }
+  .ios .list-block {
+    margin-top: 0;
+  }
+
+
 </style>
