@@ -1,5 +1,5 @@
 <template>
-    <f7-datepicker v-model="internal_value" :max-date="maxDate" :min-date="minDate" @close="onClose" class="improved-datepicker"></f7-datepicker>
+    <f7-datepicker v-model="internal_value" :close-on-select="is_ios" :max-date="maxDate" :min-date="minDate" @close="onClose" class="improved-datepicker"></f7-datepicker>
 </template>
 
 <script>
@@ -8,7 +8,8 @@
     name: 'ImprovedDatepicker',
     data () {
         return {
-            internal_value: this.convertValue(this.value) // f7-datepicker expects a string, array or number
+            internal_value: this.convertValue(this.value), // f7-datepicker expects a string, array or number
+            is_ios: window.isiOS,
         };
     },
 
