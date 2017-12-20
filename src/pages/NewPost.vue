@@ -31,7 +31,7 @@
         <f7-input v-model.trim="details" type="textarea" placeholder=""></f7-input>
       </f7-list-item>
 
-      <f7-list-item v-if="display_categories" smart-select title="Categories" class="new-post-categories">
+      <f7-list-item v-if="display_categories" smart-select smart-select-open-in="picker" title="Categories" class="new-post-categories">
         <improved-select v-model="category_ids" :options="display_categories"></improved-select>
       </f7-list-item>
 
