@@ -13,9 +13,9 @@
         Error loading news - please try again later.
     </f7-block>
 
-    <f7-block v-if="loaded">
+    <f7-block-title class="story-title">{{story.title}}</f7-block-title>
+    <f7-block inner v-if="loaded">
 
-        <h4>{{story.title}}</h4>
         <img v-if="story.image" :src="story.image.url" width="100%" :style="{maxWidth: story.image.width + 'px'}" />
 
         <p v-html="story.body_html"></p>
@@ -61,6 +61,12 @@
 </script>
 
 <style>
+
+.story-title {
+    white-space: normal;
+    margin-top: 15px;
+    text-transform: none;
+}
 
 .story-meta {
     color: #666;
