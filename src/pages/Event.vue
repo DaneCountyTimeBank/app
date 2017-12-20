@@ -82,6 +82,7 @@
 .event-title {
     white-space: normal;
     margin-top: 15px;
+    text-transform: none;
 }
 .event-block {
    margin-top: 20px;
