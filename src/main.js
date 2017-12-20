@@ -16,7 +16,24 @@ import ImprovedSelect from './components/ImprovedSelect';
 import ImprovedDatepicker from './components/ImprovedDatepicker';
 
 
-// TODO later: upgrade to vue-loader v13+ once I figure out why it breaks things (presumably a configuration option..)
+// modifying the smart select template to add Cancel/Done buttons
+// works for Android but not for iOS
+/*
+var smart_select_navbar_template = (
+    '<div class="navbar {{#if navbarTheme}}theme-{{navbarTheme}}{{/if}}">' +
+        '<div class="navbar-inner">' +
+            '{{leftTemplate}}' +
+            '<div class="center sliding">{{pageTitle}} 444</div>' +
+        '</div>' +
+    '</div>' +
+    '<div class="toolbar">' + //  toolbar-bottom for android
+        '<div class="toolbar-inner">' +
+            '<a href="#" class="link">Cancel</a>' +
+            '<a href="#" class="link">Done</a>' +
+        '</div>' +
+    '</div>'
+);
+*/
 
 /*
 // to ease debugging via console
@@ -60,6 +77,7 @@ Vue.component('improved-select', ImprovedSelect);
 Vue.component('improved-datepicker', ImprovedDatepicker);
 
 // Init App
+// https://framework7.io/docs/init-app.html
 new Vue({ // eslint-disable-line no-new
   el: '#app',
   template: '<app />',
@@ -69,16 +87,19 @@ new Vue({ // eslint-disable-line no-new
     swipePanel: 'left',
     routes: Routes,
     material: window.isMaterial,
+    smartSelectPickerHeight: window.isiOS ? '85%' : '82%', // '94%',
+    //smartSelectNavbarTemplate: smart_select_navbar_template,
     animateNavBackIcon: window.isiOS,
     pushState: true,
     pushStateNoAnimation: true,
     panelLeftBreakpoint: 960,
     preloadPreviousPage: false, // needed to fix iOS going back showing page offset w/ black bar on left and page-on-left class applied erroneously..
+    // test swiping to go back a page, may not work if preloadPreviousPage is false..
     // may also want to add 'swipeBackPage: false' if swiping back opens left panel instead of previous page and causes issues..
     // see: https://stackoverflow.com/questions/40146513/framework7-selecting-page-on-center-and-not-page-on-left
     // and: https://muut.com/i/framework7/questions:disable-page-on-left-histo
     //
-    // using uniqueHistory: true may also help..
+    uniqueHistory: true, // fixes black page on back to page already been on BUT causes page flash of wrong page when going back..
   },
   // Register App Component
   components: {
