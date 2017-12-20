@@ -35,7 +35,7 @@
             <f7-label>Date</f7-label>
             <improved-datepicker v-model="date" :max-date="max_date"></improved-datepicker>
           </f7-list-item>
-          <f7-list-item v-if="display_categories && loaded && !category_ids_preloaded" smart-select title="Categories" class="display-categories-select">
+          <f7-list-item v-if="display_categories && loaded && !category_ids_preloaded" smart-select smart-select-open-in="picker" title="Categories" class="display-categories-select">
             <improved-select v-model="category_ids" :options="display_categories"></improved-select>
           </f7-list-item>
           <f7-list-item>
@@ -68,7 +68,7 @@
             <f7-label>Date</f7-label>
             <improved-datepicker v-model="date" :max-date="max_date"></improved-datepicker>
           </f7-list-item>
-          <f7-list-item v-if="display_categories && loaded && !category_ids_preloaded" smart-select title="Categories" class="display-categories-select">
+          <f7-list-item v-if="display_categories && loaded && !category_ids_preloaded" smart-select smart-select-open-in="picker" title="Categories" class="display-categories-select">
             <improved-select v-model="category_ids" :options="display_categories"></improved-select>
           </f7-list-item>
           <f7-list-item>
