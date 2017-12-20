@@ -5,7 +5,8 @@
     </f7-navbar>
 
     <f7-block inner class="login-img">
-        <img src="static/dctb_logo.png" alt="Dane County TimeBank" width="140" height="140" />
+        <!-- <img src="static/dctb_logo.png" alt="Dane County TimeBank" width="140" height="140" /> -->
+        <img src="static/dctb_logo2.jpg" alt="Dane County TimeBank" width="328" height="224" style="margin: 15px 0 10px 0;" />
     </f7-block>
 
     <f7-block-title>Login</f7-block-title>
