@@ -18,7 +18,7 @@
 
         <img v-if="event.image" :src="event.image.url" width="100%" :style="{maxWidth: event.image.width + 'px'}" />
 
-        <p v-html="event.body_html"></p>
+        <div class="event-body" v-html="event.body_html"></div>
 
         <div class="event-block" v-if="event.date">
             <i class="material-icons color-darkgreen">access_time</i>
@@ -108,5 +108,14 @@
 .color-darkgreen {
     color: #0f650b;
 }
+
+.event-body p {
+    margin: 0;
+}
+
+.event-body {
+    margin-top: 1em;
+}
+
 
 </style>
