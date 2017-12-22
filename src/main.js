@@ -49,26 +49,33 @@ require.ensure([], function() {
 
 
 // Set up some useful globals
-window.isMaterial = !window.Framework7.prototype.device.ios;
-window.isiOS = window.Framework7.prototype.device.ios;
+window.isMaterial = true; // !window.Framework7.prototype.device.ios;
+window.isiOS = false; // window.Framework7.prototype.device.ios; // b/c supporting both is too much work w/ all the differences
 
 // TODO later: use proper state managment instead of a global event bus
 window.timebank_event_bus = new Vue();
 
 // Import F7 iOS Theme Styles
 /* eslint-disable global-require */
+/*
 if (window.isiOS) {
   const Framework7Theme =
     require('framework7/dist/css/framework7.ios.min.css');
   const Framework7ThemeColors =
     require('framework7/dist/css/framework7.ios.colors.min.css');
 } else {
+*/
   /* OR for Material Theme: */
   const Framework7ThemeMaterial =
     require('framework7/dist/css/framework7.material.min.css');
   const Framework7ThemeColorsMaterial =
     require('framework7/dist/css/framework7.material.colors.min.css');
-}
+  
+   document.body.className = 'theme-green';
+//}
+
+const CustomCSS = require('./assets/custom.css');
+
 
 // Init F7 Vue Plugin
 Vue.use(Framework7Vue);
