@@ -8,10 +8,10 @@
         Dane County TimeBank
       </f7-nav-center>
     </f7-navbar>
-    <!-- Scrollable page content-->
 
     <f7-block-title>
-        News
+        <i class="material-icons header-icon color-cyan news-icon">public</i>
+        News 
     </f7-block-title>
     <f7-preloader v-if="stories_loading" size="24px" color="gray"></f7-preloader>
     <f7-block v-if="stories_error">
@@ -36,6 +36,7 @@
     </template>
 
     <f7-block-title>
+        <i class="material-icons header-icon color-deeporange event-icon">event</i>
         Events
     </f7-block-title>
     <f7-preloader v-if="events_loading && !events_error" size="24px" color="gray"></f7-preloader>
@@ -62,12 +63,33 @@
     </template>
 
 
-    <f7-block-title>Links</f7-block-title>
     <f7-list>
-        <f7-list-item link="/post" title="List Offer / Request"></f7-list-item>
-        <f7-list-item link="/offers" title="Offers"></f7-list-item>
-        <f7-list-item link="/requests" title="Requests"></f7-list-item>
-        <f7-list-item link="/members/exchange" title="Record an Exchange"></f7-list-item>
+        <f7-list-item
+            link="/post"
+            media="<i class='material-icons color-green3'>create</i>"
+            title="List Offer / Request"
+        />
+        <f7-list-item
+            link="/offers"
+            media="<i class='material-icons color-green3'>local_offer</i>"
+            title="Offers"
+        />
+        <f7-list-item
+            link="/requests"
+            media="<i class='material-icons color-green3'>local_offer</i>"
+            title="Requests"
+        />
+        <f7-list-item
+            link="/members/exchange"
+            media="<i class='material-icons color-green3'>assignment</i>"
+            title="Record Exchange"
+        />
+        <f7-list-item
+            link="#"
+            @click.prevent.stop="viewUserPosts()"
+            media="<i class='material-icons color-green3'>local_offer</i>"
+            title="Your Offers &amp; Requests"
+        />
     </f7-list>
 
 
@@ -99,6 +121,12 @@
             },
             selectEvent (item) {
                 this.$root.event = item;
+            },
+            viewUserPosts () {
+                this.$root.view_user_name = 'you'; // cheap way to not have to query the user object
+
+                // XXX: need to reference router this way when the component could be loaded w/o a hash path being set
+                this.$f7.mainView.router.load({url: '/posts?user_id=' + localStorage.user_id});
             },
 
         },
@@ -133,12 +161,37 @@
     };
 </script>
 
-<style>
+<style scoped>
 
 .home-page .preloader {
     margin-left: 16px;
     margin-top: 8px;
     opacity: 0.4;
 }
+
+.header-icon {
+    vertical-align: -30%;
+    margin-right: 12px;
+}
+
+/*
+.event-icon {
+    color: #084A2F;
+    color: #B77A44;
+}
+
+.news-icon {
+    color: #439776;
+}
+*/
+
+/*
+
+#88A33C
+
+// logo color
+#0A845F
+
+*/
 
 </style>
