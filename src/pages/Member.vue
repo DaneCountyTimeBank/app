@@ -159,8 +159,6 @@ user.login = "1487805566"
         filters: {
             size_picture_to_fit (user, w, h) {
                 
-                console.log('size user', user);
-
                 var x = user.picture_width,
                     y = user.picture_height;
 
@@ -174,8 +172,6 @@ user.login = "1487805566"
                 }
 
                 var out = {maxWidth: x + 'px', maxHeight: y + 'px'};
-
-                console.log('returning size', out);
 
                 return out;
             },
