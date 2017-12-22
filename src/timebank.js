@@ -17,15 +17,26 @@ function log() {
     console.log.apply(console, arguments);
 }
 
-var SITE_PATH = "https://timebank-testsite.org",
+var USE_PROD_API = true, // enable for development to use production data instead of test data
+
+    PROD_DOMAIN = "danecountytimebank.org",
+    MOBILE_DOMAIN = "m.danecountytimebank.org",
+    TEST_DOMAIN = "timebank-testsite.org",
+
+    PROD = USE_PROD_API || (window.location.href.indexOf('https://' + MOBILE_DOMAIN + '/') === 0),
+
+    API_PATH = 'https://' + (PROD ? MOBILE_DOMAIN : TEST_DOMAIN),
+    SITE_PATH = 'https://' + (PROD ? PROD_DOMAIN : TEST_DOMAIN),
+
     FILE_PATH = SITE_PATH + '/sites/danecountytimebank.org/files/',
+
     //ORIG_PIC_PATH = FILE_PATH,
     LARGE_PIC_PATH = FILE_PATH + 'styles/large/public/',
     THUMB_PATH = FILE_PATH + 'styles/thumbnail/public/';
     //PROFILE_PIC_PATH = THUMB_PATH + 'pictures/';
 
 
-Drupal.settings.site_path = SITE_PATH;
+Drupal.settings.site_path = API_PATH;
 Drupal.settings.endpoint = "rest";
 Drupal.settings.cache.entity.enabled = true;
 Drupal.settings.cache.entity.expiration = 60*60; // *24; // seconds
@@ -348,6 +359,7 @@ function get_post(pid, success, error) {
             type: node.want === '1' ? 'want' : 'offer',
             title: node.title,
             body: cleanup_html(get(node, 'body.und[0].safe_value', ''), true),
+            text_body: get(node, 'body.und[0].value'),
             changed: 1 * node.changed,
             created: 1 * node.created,
             end: 1 * node.end,
