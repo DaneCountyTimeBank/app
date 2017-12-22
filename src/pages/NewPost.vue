@@ -121,7 +121,7 @@
                 data.edit_post = edit_post;
                 data.post_type = edit_post.type;
                 data.post_title = edit_post.title;
-                data.details = edit_post.body;
+                data.details = edit_post.text_body;
 
                 if (data.post_type === 'offer') {
                     data.header_text = 'I am offering..';
@@ -315,6 +315,8 @@
 
 <style>
 
-
+.new-post-radio .item-title {
+    margin-top: 7px;
+}
 
 </style>
