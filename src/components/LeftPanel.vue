@@ -3,23 +3,23 @@
     <f7-navbar :title="logged_in ? 'Menu' : ''"></f7-navbar>
     <f7-page>
       <template v-if="logged_in">
-      <!-- <f7-block-title>Links</f7-block-title> -->
       <f7-list>
         <f7-list-group>
             <f7-list-item title="" group-title></f7-list-item>
             <f7-list-item
               link="/home"
+              media="<i class='material-icons color-green2'>home</i>"
               title="Home"
               link-view="#main-view"
               link-reload
               link-close-panel
             />
-            <!-- <li class="item-divider"></li> -->
         </f7-list-group>
         <f7-list-group>
             <f7-list-item title="" group-title></f7-list-item>
             <f7-list-item
               link="/post"
+              media="<i class='material-icons color-green2'>create</i>"
               title="List Offer / Request"
               link-view="#main-view"
               link-reload
@@ -27,6 +27,7 @@
             />
             <f7-list-item
               link="/offers"
+              media="<i class='material-icons color-green2'>local_offer</i>"
               title="Offers"
               link-view="#main-view"
               link-reload
@@ -34,6 +35,7 @@
             />
             <f7-list-item
               link="/requests"
+              media="<i class='material-icons color-green2'>local_offer</i>"
               title="Requests"
               link-view="#main-view"
               link-reload
@@ -41,7 +43,8 @@
             />
             <f7-list-item
               link="/members/exchange"
-              title="Record an Exchange"
+              media="<i class='material-icons color-green2'>assignment</i>"
+              title="Record Exchange"
               link-view="#main-view"
               link-reload
               link-close-panel
@@ -51,6 +54,7 @@
             <f7-list-item title="" group-title></f7-list-item>
             <f7-list-item
               link="/members"
+              media="<i class='material-icons color-green2'>people</i>"
               title="Members"
               link-view="#main-view"
               link-reload
@@ -61,6 +65,7 @@
             <f7-list-item title="" group-title></f7-list-item>
             <f7-list-item
               link="/member/me"
+              media="<i class='material-icons color-green2'>account_box</i>"
               title="Your Account"
               link-view="#main-view"
               link-reload
@@ -71,6 +76,7 @@
             <f7-list-item title="" group-title></f7-list-item>
             <f7-list-item
               link="/about"
+              media="<i class='material-icons color-green2'>info</i>"
               title="About"
               link-view="#main-view"
               link-reload
@@ -78,6 +84,7 @@
             />
             <f7-list-item
               link="/feedback"
+              media="<i class='material-icons color-green2'>message</i>"
               title="Feedback"
               link-view="#main-view"
               link-reload
@@ -86,6 +93,7 @@
             <f7-list-item
               @click.prevent.stop="logout"
               link="#"
+              media="<i class='material-icons color-green2'>exit_to_app</i>"
               title="Logout"
               link-view="#main-view"
               link-reload
@@ -125,8 +133,6 @@
 
         // TODO: invite a friend to join functionality (social media & email options)
         // TODO: become a trained onboarder / coordinator functionality
-
-        // TODO later: add icons to these links
 
         // TODO later: provide menu, links & functionality (eg. contact form) for logged out users
 
@@ -175,12 +181,16 @@
   .list-group-title {
     height: 16px;
   }
+  .list-block {
+    margin-top: 5px;
+  }
+  /*
   .android .list-block {
     margin-top: 5px;
   }
   .ios .list-block {
     margin-top: 0;
   }
-
+  */
 
 </style>
