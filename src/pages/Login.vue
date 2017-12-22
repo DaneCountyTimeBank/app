@@ -5,7 +5,7 @@
     </f7-navbar>
 
     <f7-block inner class="login-img">
-        <img src="static/dctb_logo2.jpg" alt="Dane County TimeBank" width="288" height="198" style="margin: 15px 0 10px 0;" />
+        <img src="static/dctb_logo3.jpg" alt="Dane County TimeBank" width="288" height="198" />
     </f7-block>
 
     <f7-block-title>Login</f7-block-title>
@@ -127,10 +127,15 @@
     text-align:center;
     margin-top: 0;
     margin-bottom: 0;
+    background: #4cb050;
 }
 .login-img .content-block-inner {
     padding-top: 0;
     padding-bottom: 0;
+}
+
+.login-img img {
+    margin: 15px 0 10px 0;
 }
 
 </style>
