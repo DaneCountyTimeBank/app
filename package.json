@@ -20,10 +20,11 @@
     "bluebird": "^3.5.1",
     "framework7": "^1.6.5",
     "framework7-icons": "^0.9.0",
-    "framework7-vue": "^0.9.3",
+    "framework7-vue": "^0.9.4",
     "lodash": "^4.17.4",
     "vue": "^2.5.3",
-    "vue-infinite-loading": "^2.2.1"
+    "vue-infinite-loading": "^2.2.1",
+    "sanitize-html": "^1.16.3"
   },
   "devDependencies": {
     "autoprefixer": "^6.4.0",
@@ -84,7 +85,7 @@
     "sinon": "^1.17.3",
     "sinon-chai": "^2.8.0",
     "url-loader": "^0.5.7",
-    "vue-loader": "^12.2.1",
+    "vue-loader": "^12.2.2",
     "vue-style-loader": "^3.0.3",
     "vue-template-compiler": "^2.5.3",
     "webpack": "^1.13.2",
