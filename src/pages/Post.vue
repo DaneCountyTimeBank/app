@@ -16,7 +16,7 @@
         <div class="post-chips">
             <f7-chip v-if="post.area" :text="post.area" bg="purple" color="white"></f7-chip>
             <template v-if="post.categories" v-for="category in post.categories">
-                &nbsp;<f7-chip :text="category.name" bg="green" color="white"></f7-chip>
+                &nbsp;<f7-chip :text="category.name" bg="indigo" color="white"></f7-chip>
             </template>
         </div>
 
@@ -41,6 +41,8 @@
                     <f7-button @click="editPost()" :href="post | edit_link" class="button button-fill button-raised">Edit</f7-button>
                     <f7-button @click="deletePost()" class="button button-raised">Delete</f7-button>
                     <!-- 
+
+                    color-deeporange seems to work well for buttons here but I don't like it for buttons elsewhere..
                     
                     TODO later: could allow recording an exchange where own post is the service that was given or received
                                 if an offer, can collect payment from someone else who claimed it
@@ -111,6 +113,7 @@
                 image: null,
                 categories: [],
                 created: null,
+                post_word: '', // Offer or Request
             };
 
             return {
@@ -182,7 +185,6 @@
             },
             viewProfile (post) {
                 this.$root.view_user_name = post.user_name;
-                console.log('view profile of post author', post.user_id, post);
             },
             showReply () {
                 this.reply = 1;
@@ -215,21 +217,21 @@
 
                 var self = this;
 
-                self.$f7.confirm('Are you sure?', 'Delete Post', function(){
+                self.$f7.confirm('Are you sure?', 'Delete ' + self.post_word, function(){
 
                     self.$f7.showIndicator(); // shows loading but doesn't block interactions w/ the pgae like showPreloader does
 
                     Timebank.delete_post(self.post.post_id, function(){
 
                         self.$f7.hideIndicator();
-                        self.$f7.addNotification({message: 'Post deleted!', hold: 4000});
+                        self.$f7.addNotification({message: self.post_word + ' deleted!', hold: 4000});
 
                         self.$router.load({url: '/home'});
 
                     }, function(){
 
                         self.$f7.hideIndicator();
-                        self.$f7.addNotification({message: 'Error deleting post - please try again later.', hold: 3500});
+                        self.$f7.addNotification({message: 'Error deleting - please try again later.', hold: 3500});
 
                     });
                 });
@@ -250,6 +252,9 @@
 
                     this.own_post = (post.user_id * 1 === current_user_id);
                     this.post = post;
+
+                    this.post_word = (post.type === 'offer' ? 'Offer' : 'Request');
+
                     this.post_loaded = true;
                 },
                 () => {
@@ -278,10 +283,12 @@
     margin-bottom: 20px;
 }
 
+/* missing on ios so we define it to be the pink ios theme color */
+/*
 .ios .bg-purple {
-    /* missing on ios so we define it to be the pink ios theme color */
     background-color: #ff2d55;
 }
+*/
 
 .post-image {
     margin-top: 10px;
