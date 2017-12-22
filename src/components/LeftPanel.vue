@@ -170,8 +170,15 @@
 <style scoped>
   .panel-left .page {
     margin-top: 44px;
-    padding-bottom: 44px;
   }
+  .panel-left .list-block {
+    margin-bottom: 0;
+  }
+  
+  .panel-left .page, .panel-left .page-content {
+    height: auto;
+  }
+
   @media (min-width: 960px) {
     .panel.panel-left {
       border-right: 1px solid #b2b2b2;
