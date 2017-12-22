@@ -8,3 +8,20 @@
     color: #4caf50;
 }
 
+
+/*
+
+TODO: on higher resolution, the image ends up too large, 
+      probably because event.image width/height data is for the large or full resolution image
+      and not the medium resolution version that is loaded
+
+fixed for now by hardcoding the max medium size width (as determined by checking some of the images..)
+previously, max width was set by below code on the <img> tag directly
+
+:style="{maxWidth: event.image.width + 'px'}"
+
+*/
+.medium-image {
+    width: 100%;
+    max-width: 480px;
+}

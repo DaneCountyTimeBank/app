@@ -13,6 +13,10 @@
         {{post | post_type_desc}} 
         <f7-link v-if="post.user_name" :href="post | profile_link" @click="viewProfile(post)">{{post.user_name}}</f7-link>
 
+        <!--
+        TODO: if more than one or two categories, put these into a dropdown or something like that w/ a label w/ the count
+              so that the categories don't take up too much space..
+        -->
         <div class="post-chips">
             <f7-chip v-if="post.area" :text="post.area" bg="purple" color="white"></f7-chip>
             <template v-if="post.categories" v-for="category in post.categories">
@@ -27,7 +31,7 @@
             Error loading post - please try again later.
         </f7-block>
 
-        <img class="post-image" v-if="post.image" :src="post.image.url" />
+        <img class="post-image medium-image" v-if="post.image" :src="post.image.url" />
 
         <div class="post-body" v-html="post.body"></div>
 
@@ -293,10 +297,6 @@
 .post-image {
     margin-top: 10px;
     margin-bottom: -8px;
-    
-    /* width="100%" :style="{maxWidth: post.image.width + 'px'}" */
-    width: 100%;
-    max-width: 480px;
 }
 .post-body {
     margin-bottom: 26px;

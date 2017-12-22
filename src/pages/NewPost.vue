@@ -28,6 +28,7 @@
         <f7-input v-model.trim="post_title" type="text" placeholder=""/>
       </f7-list-item>
 
+      <!-- TODO: make this auto-grow to a bigger height based on contents (but maybe have a max height) -->
       <f7-list-item>
         <f7-label>Details</f7-label>
         <f7-input v-model.trim="details" type="textarea" placeholder=""></f7-input>

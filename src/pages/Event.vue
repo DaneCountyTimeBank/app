@@ -16,7 +16,7 @@
     <f7-block-title class="event-title">{{event.title}}</f7-block-title>
     <f7-block inner v-if="loaded">
 
-        <img v-if="event.image" :src="event.image.url" width="100%" :style="{maxWidth: event.image.width + 'px'}" />
+        <img v-if="event.image" :src="event.image.url" class="medium-image" />
 
         <div class="event-body" v-html="event.body_html"></div>
 

@@ -16,7 +16,7 @@
     <f7-block-title class="story-title">{{story.title}}</f7-block-title>
     <f7-block inner v-if="loaded">
 
-        <img v-if="story.image" :src="story.image.url" width="100%" :style="{maxWidth: story.image.width + 'px'}" />
+        <img v-if="story.image" :src="story.image.url" class="medium-image" />
 
         <div class="story-body" v-html="story.body_html"></div>
 
