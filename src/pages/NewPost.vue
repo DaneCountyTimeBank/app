@@ -17,9 +17,11 @@
     </f7-block>
 
     <f7-list form v-if="loaded && !load_error">
-      <f7-list-item group-title title="I am.."></f7-list-item>
-      <f7-list-item v-model="post_type" radio name="offer-want" value="offer" input-value="offer" title="Offering"></f7-list-item>
-      <f7-list-item v-model="post_type" radio name="offer-want" value="want" input-value="want" title="Requesting"></f7-list-item>
+      <f7-list-item group-title :title="header_text"></f7-list-item>
+      <template v-if="!edit_post_id">
+        <f7-list-item v-model="post_type" class="new-post-radio" radio name="offer-want" value="offer" input-value="offer" title="Offering"></f7-list-item>
+        <f7-list-item v-model="post_type" class="new-post-radio" radio name="offer-want" value="want" input-value="want" title="Requesting"></f7-list-item>
+      </template>
 
       <f7-list-item>
         <f7-label>Title</f7-label>
@@ -79,13 +81,16 @@
 
                 end_time_ms = year_from_now_ms,
 
+                wording = 'Offer / Request',
+
                 defaults = {
                     edit_post_id: edit_post_id,
 
-                    title: edit_post_id ? 'Edit Post' : 'New Post',
+                    title: (edit_post_id ? 'Edit' : 'List') + ' ' + wording,
                     display_categories: null,
                     min_date: new Date(), // don't allow selecting a date before today
 
+                    header_text: 'I am..',
                     post_type: '',
                     post_title: '',
                     details: '',
@@ -95,8 +100,8 @@
                     post_submitted: false,
                     new_post_id: null,
                     edit_post: null,
-                    submitted_text: edit_post_id ? 'Post updated!' : 'Post submitted!',
-                    submitted_hide_text: edit_post_id ? 'Continue editing' : 'New Post',
+                    submitted_text: edit_post_id ? 'Updated!' : 'Submitted!',
+                    submitted_hide_text: edit_post_id ? 'Continue editing' : ('List ' + wording),
                     edit_post_loaded: false,
                     post_categories_loaded: false,
                     load_error: false,
@@ -118,13 +123,21 @@
                 data.post_title = edit_post.title;
                 data.details = edit_post.body;
 
+                if (data.post_type === 'offer') {
+                    data.header_text = 'I am offering..';
+                    data.title = 'Edit Offer';
+                } else {
+                    data.header_text = 'I am requesting..';
+                    data.title = 'Edit Request';
+                }
+
                 var edit_post_end_ms = edit_post.end * 1000,
                     now_ms = (new Date()).getTime(),
                     year_from_now_ms = now_ms + (365*24*3600*1000),
                     category_ids = [];
 
                 if (edit_post_end_ms <= now_ms) {
-                    console.log('edit post date is too old, updating to year from now', edit_post.end);
+                    //console.log('edit post date is too old, updating to year from now', edit_post.end);
                     // datepicker breaks if the preset date is in the past
                     edit_post_end_ms = year_from_now_ms;
                 }
@@ -197,7 +210,7 @@
                 } else {
                     var now_str = this.dateToString(new Date());
 
-                    console.log('dt check', now_str, end_date_str, now_str >= end_date_str);
+                    //console.log('dt check', now_str, end_date_str, now_str >= end_date_str);
 
                     if (now_str >= end_date_str) {
                         err = 'Please choose an expiration date in the future.';
@@ -218,7 +231,7 @@
                 };
 
                 if (this.edit_post) {
-                    this.$f7.showPreloader('Updating post..');
+                    this.$f7.showPreloader('Updating..');
 
                     Timebank.update_post(
                         this.edit_post.post_id,
@@ -232,12 +245,12 @@
                         },
                         (status, message) => {
                             this.$f7.hidePreloader();
-                            this.$f7.addNotification({message: 'Error updating post - please try again later.', hold: 3500});
+                            this.$f7.addNotification({message: 'Error updating - please try again later.', hold: 3500});
                         }
                     );
                 } else {
                     
-                    this.$f7.showPreloader('Submitting post..');
+                    this.$f7.showPreloader('Submitting..');
 
                     Timebank.create_post(
                         args,
@@ -251,7 +264,7 @@
                         },
                         (status, message) => {
                             this.$f7.hidePreloader();
-                            this.$f7.addNotification({message: 'Error submitting post - please try again later.', hold: 3500});
+                            this.$f7.addNotification({message: 'Error submitting - please try again later.', hold: 3500});
                         }
                     );
                 }
