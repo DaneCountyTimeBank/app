@@ -181,7 +181,7 @@
 
   @media (min-width: 960px) {
     .panel.panel-left {
-      border-right: 1px solid #b2b2b2;
+      border-right: 12px solid #f4f4f4;
     }
   }
 
@@ -200,4 +200,10 @@
   }
   */
 
+</style>
+
+<style>
+  .panel-left .list-block .item-media+.item-inner {
+    margin-left: 10px;
+  }
 </style>
