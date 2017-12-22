@@ -1,6 +1,8 @@
 /* global console Drupal node_save node_delete node_load user_login user_logout user_retrieve node_create entity_create entity_index node_index taxonomy_term_index system_connect */
 
-import { map, forIn, filter, get, endsWith, property, trimEnd, sortBy } from "lodash";
+import { map, forIn, filter, get, property, trimEnd, sortBy } from "lodash";
+
+import sanitizeHtml from 'sanitize-html';
 
 // if need date stuff, use https://date-fns.org/ instead of moment.js
 
@@ -146,17 +148,17 @@ function _user(user) {
 
     user.user_id = user.uid;
 
-    if (user.picture && user.picture.uri) {
+    var filepath = get(user, 'picture.uri') || get(user, 'field_user_photo.und[0].uri');
 
+    if (filepath) {
         /*
         user.picture_width = 1 * user.picture.width;
         user.picture_height = 1 * user.picture.height;
 
         doesn't have width or height..
         */
-        user.picture_url = large_image(user.picture.uri);
-
-        user.thumbnail_url = thumb_image(user.picture.uri);
+        user.picture_url = large_image(filepath);
+        user.thumbnail_url = thumb_image(filepath);
     }
 
     var addr_info = user.profile_address ? user.profile_address.und : null;
@@ -345,7 +347,7 @@ function get_post(pid, success, error) {
             post_id: node.nid,
             type: node.want === '1' ? 'want' : 'offer',
             title: node.title,
-            body: cleanup_html(get(node, 'body.und[0].safe_value', '')),
+            body: cleanup_html(get(node, 'body.und[0].safe_value', ''), true),
             changed: 1 * node.changed,
             created: 1 * node.created,
             end: 1 * node.end,
@@ -435,7 +437,7 @@ function _transaction(x) {
         payer: x.payer,
         payer_name: x.payer_name,
 
-        description: cleanup_html(get(x, 'transaction_description.und[0].safe_value', '')),
+        description: cleanup_html(get(x, 'transaction_description.und[0].safe_value', ''), true),
         hours: get(x, 'worth.und[0].quantity', null),
         category_ids: category_ids
     };
@@ -717,11 +719,19 @@ function date_to_object(date_str) {
 
 function update_post(node_id, options, success, error) {
 
+    // XXX: doesn't currently support changing the post type (which is passed as options.type)
+    //      not sure if node_save supports this or if it's just that I haven't found the correct way to do it yet
+    //      (b/c the desktop site doesn't have the option to change a posts type when editing the post)
+
     // TODO later: support editing the image
 
     // XXX: could speed up by getting node earlier than at update submission..
 
     get_node(node_id, function(node) {
+
+        // updating stopped working b/c of a problem w/ this field
+        // but deleting the field seems to work..
+        delete node.field_offer_request; 
 
         node.title = options.title;
         if (node.body.und && node.body.und[0]) { // body may not be set if empty
@@ -1002,6 +1012,7 @@ function get_story(story_id, success, error) {
             story_id: story.nid,
             title: story.title,
             created: story.created,
+            user_id: story.uid,
             user_name: story.name,
             image: get_node_image(story),
             body_html: get_node_body(story),
@@ -1101,13 +1112,46 @@ function get_stories(num, success, error) {
 // http://danecountytimebank.org/faq
 
 
-function cleanup_html(html) {
+function cleanup_html(html, user_submitted) {
+
+    html = sanitizeHtml(
+        html,
+        {
+            allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img', 'span']),
+            //allowedAttributes: ,
+            allowedAttributes: {
+                a: ['href', 'name', 'target'],
+                img: ['src', 'alt', 'width', 'height', 'max-width', 'max-height'], // style max-width, max-height
+                div: ['style'],
+                p: ['style'],
+                span: ['style'],
+            },
+            allowedStyles: {
+                '*': {
+                    // don't allow user submitted content to change the color or font-size
+                    // (b/c they could make it too small or too light such that it is unreadable)
+                    'color': [user_submitted ? /^$/ : /.*/],
+                    'font-size': [user_submitted ? /^$/ : /.*/],
+                    'font-weight': [/.*/],
+                    'text-decoration': [/.*/],
+                    'font-style': [/.*/],
+                    'text-decoration-line': [/.*/],
+                    'text-align': [/.*/],
+                }
+            }
+
+        }
+    );
+
+    // XXX: not sure if we should allow iframes..
+    // <iframe allowfullscreen="" frameborder="0" height="360" mozallowfullscreen="" src="https://player.vimeo.com/video/147421311" webkitallowfullscreen="" width="640"></iframe>
+
+    // could use a sanitizeHTML transformation to more cleanly make this change.. https://github.com/punkave/sanitize-html
     html = trimEnd(html.replace(/<a /g, '<a class="link external" target="_blank" ')); // very naive implementation..
 
-    var empty = '<p>&nbsp;</p>';
-    if (endsWith(html, empty)) {
-        html = trimEnd(html.replace(new RegExp(empty + '$'), ''));
-    }
+    // remove paragraph based whitespace
+    html = trimEnd(html).replace(/(\s+<p>(\s|&nbsp;)+<\/p>)+$/g, ''); 
+
     return html;
 }
 
