@@ -230,7 +230,7 @@ user.login = "1487805566"
 .profile-pic {
     width: 100%;
     max-width: 280px;
-    margin-top: -32px;
+    margin-top: -15px;
     margin-bottom: -10px;
 }
 
