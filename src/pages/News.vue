@@ -18,10 +18,12 @@
 
         <img v-if="story.image" :src="story.image.url" width="100%" :style="{maxWidth: story.image.width + 'px'}" />
 
-        <p v-html="story.body_html"></p>
+        <div class="story-body" v-html="story.body_html"></div>
 
         <div class="story-meta">
-            Posted {{story.created | timestamp_to_date}} by {{story.user_name}}
+            Posted {{story.created | timestamp_to_date}}
+            by
+            <f7-link :href="story | profile_link" @click="viewProfile(story)">{{story.user_name}}</f7-link>
         </div>
 
     </f7-block>
@@ -44,6 +46,16 @@
             };
         },
 
+        filters: {
+            profile_link: story => `/member/${story.user_id}`,
+        },
+
+        methods: {
+            viewProfile (story) {
+                this.$root.view_user_name = story.user_name;
+            },
+        },
+
         created () {
             Timebank.get_story(
                 this.story_id, 
@@ -60,7 +72,7 @@
 
 </script>
 
-<style>
+<style scoped>
 
 .story-title {
     white-space: normal;
@@ -71,6 +83,18 @@
 .story-meta {
     color: #666;
     margin: 35px 0;
+}
+
+</style>
+
+<style>
+
+.story-body p {
+    margin: 0;
+}
+
+.story-body {
+    margin-top: 1em;
 }
 
 </style>
