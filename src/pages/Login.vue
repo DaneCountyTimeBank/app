@@ -26,12 +26,6 @@
 
     </f7-list>
 
-    <!--
-
-    TODO: need a forgot your password option
-
-    -->
-
     <f7-block-title>Not a member yet?</f7-block-title>
     <f7-block inner>
         TimeBank members are a caring and interconnected community of people who help each other by sharing their abilities, talents, and experiences.

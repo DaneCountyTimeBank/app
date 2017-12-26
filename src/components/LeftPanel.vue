@@ -131,11 +131,6 @@
 
     methods: {
 
-        // TODO: invite a friend to join functionality (social media & email options)
-        // TODO: become a trained onboarder / coordinator functionality
-
-        // TODO later: provide menu, links & functionality (eg. contact form) for logged out users
-
         logoutSuccess () {
             delete localStorage.user_id;
             window.timebank_event_bus.$emit('logout');

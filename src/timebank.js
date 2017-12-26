@@ -334,8 +334,8 @@ function get_post(pid, success, error) {
                 //             480x480 is another one..
                 //             so i'm gonna guess 480
 
-                height: 1 * img.height,
-                width: 1 * img.width,
+                //height: 1 * img.height,
+                //width: 1 * img.width,
             };
         }
 
@@ -1002,8 +1002,9 @@ function get_node_image(node, path) {
     if (i) {
         im = {
             url: large_image(i.uri),
-            width: 1 * i.width,
-            height: 1 * i.height,
+            // the width & height don't seem to be accurate for the large image.. may be for a larger/full resolution version
+            //width: 1 * i.width,
+            //height: 1 * i.height,
         };
     }
     return im;

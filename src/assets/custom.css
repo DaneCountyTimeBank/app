@@ -11,14 +11,9 @@
 
 /*
 
-TODO: on higher resolution, the image ends up too large, 
-      probably because event.image width/height data is for the large or full resolution image
-      and not the medium resolution version that is loaded
-
-fixed for now by hardcoding the max medium size width (as determined by checking some of the images..)
-previously, max width was set by below code on the <img> tag directly
-
-:style="{maxWidth: event.image.width + 'px'}"
+XXX: for higher resolution devices, could use the large size image
+     which is the image that has the width/height returned by news & event models
+     (so should probably remove that code or adapt it to return medium & large images paths & sizes)
 
 */
 .medium-image {
