@@ -91,7 +91,7 @@
               link-close-panel
             />
             <f7-list-item
-              @click.prevent.stop="logout"
+              @click.prevent.stop="logout()"
               link="#"
               media="<i class='material-icons color-green2'>exit_to_app</i>"
               title="Logout"
@@ -127,6 +127,11 @@
         window.timebank_event_bus.$on('logout', () => {
             this.logged_in = false;
         });
+
+        window.timebank_event_bus.$on('session-expired', () => {
+            this.logout('Your login session has expired..', 1500);
+        });
+
     },
 
     methods: {
@@ -140,21 +145,27 @@
             this.$f7.mainView.router.load({url: '/login'});
         },
 
-        logout () {
+        logout (msg, delay) {
             this.$f7.closePanel();
-            this.$f7.showPreloader('Logging out..');
+            this.$f7.showPreloader(msg || 'Logging out..');
 
-            Timebank.logout(() => {
-                this.$f7.hidePreloader();
-                this.logoutSuccess();
-            }, (status, message) => {
-                this.$f7.hidePreloader();
-                if (message.indexOf('User is not logged in.') > -1) {
-                    this.logoutSuccess();
-                } else {
-                    this.$f7.addNotification({message: 'Error logging out - please try again later.', hold: 3500});
-                }
-            });
+            delay = delay || 0;
+
+            var self = this;
+
+            setTimeout(function(){
+                Timebank.logout(() => {
+                    self.$f7.hidePreloader();
+                    self.logoutSuccess();
+                }, (status, message) => {
+                    self.$f7.hidePreloader();
+                    if (message.indexOf('User is not logged in.') > -1) {
+                        self.logoutSuccess();
+                    } else {
+                        self.$f7.addNotification({message: 'Error logging out - please try again later.', hold: 3500});
+                    }
+                });
+            }, delay);
         }
     }
 

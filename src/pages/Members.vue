@@ -163,9 +163,11 @@
 
                     this.old_search_query = active_query;
 
-                }, (status, msg) => {
+                }, (status, msg, logged_out) => {
 
-                    if (status === 403) {
+                    if (logged_out) {
+                        window.timebank_event_bus.$emit('session-expired');
+                    } else if (status === 403) {
 
                         this.members = [];
                         // complete w/o loaded causes no members found message to be displayed

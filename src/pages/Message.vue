@@ -130,9 +130,14 @@
 
                         this.$f7.addNotification({message: 'Message sent!', hold: 3500});
                     },
-                    (status, msg) => {
+                    (status, msg, logged_out) => {
                         this.$f7.hideIndicator();
-                        this.$f7.addNotification({message: 'Error sending message - please try again later.', hold: 3500});
+
+                        if (logged_out) {
+                            window.timebank_event_bus.$emit('session-expired');
+                        } else {
+                            this.$f7.addNotification({message: 'Error sending message - please try again later.', hold: 3500});
+                        }
                     }
                 );
 
@@ -150,8 +155,13 @@
                         this.user_name = user.name;
                         this.user_loaded = true;
                     },
-                    (status, msg) => {
-                        this.load_error = true;
+                    (status, msg, logged_out) => {
+
+                        if (logged_out) {
+                            window.timebank_event_bus.$emit('session-expired');
+                        } else {
+                            this.load_error = true;
+                        }
                     }
                 );
             } else {

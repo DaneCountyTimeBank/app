@@ -164,7 +164,10 @@
                 }
 
                 this.send_disabled = true;
-                this.$f7.showIndicator();
+                this.$f7.showIndicator(); 
+                // TODO: show "Sending..""
+                //       this.$f7.showPreloader('Submitting..');
+                //       this.$f7.hidePreloader();
 
                 Timebank.send_msg(
                     {user_id: recipient, subject: subject, message: message},
@@ -180,9 +183,14 @@
 
                         this.$f7.addNotification({message: 'Message sent!', hold: 3500});
                     },
-                    (status, msg) => {
+                    (status, msg, logged_out) => {
                         this.$f7.hideIndicator();
-                        this.$f7.addNotification({message: 'Error sending message - please try again later.', hold: 3500});
+
+                        if (logged_out) {
+                            window.timebank_event_bus.$emit('session-expired');
+                        } else {
+                            this.$f7.addNotification({message: 'Error sending message - please try again later.', hold: 3500});
+                        }
                     }
                 );
 
@@ -232,10 +240,15 @@
 
                         self.$router.load({url: '/home'});
 
-                    }, function(){
+                    }, function(status, msg, logged_out){
 
                         self.$f7.hideIndicator();
-                        self.$f7.addNotification({message: 'Error deleting - please try again later.', hold: 3500});
+
+                        if (logged_out) {
+                            window.timebank_event_bus.$emit('session-expired');
+                        } else {
+                            self.$f7.addNotification({message: 'Error deleting - please try again later.', hold: 3500});
+                        }
 
                     });
                 });

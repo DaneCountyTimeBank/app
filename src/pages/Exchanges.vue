@@ -177,9 +177,11 @@
 
                         this.loading = false;
 
-                    }, (status, msg) => {
+                    }, (status, msg, logged_out) => {
 
-                        if (status === 403) {
+                        if (logged_out) {
+                            window.timebank_event_bus.$emit('session-expired');
+                        } else if (status === 403) {
 
                             this.exchanges = [];
                             // complete w/o loaded causes no members found message to be displayed

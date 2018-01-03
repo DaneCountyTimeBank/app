@@ -148,8 +148,14 @@
             Timebank.get_events({start: 0, num: 3}, data => {
                 this.events_loading = false;
                 this.events = data.events;
-            }, () => {
-                this.events_error = true;
+            }, (status, msg, logged_out) => {
+
+                if (logged_out) {
+                    window.timebank_event_bus.$emit('session-expired');
+                } else {
+                    this.events_error = true;
+                }
+
             });
 
             // TODO later: add a projects page and show projects

@@ -193,8 +193,12 @@ user.login = "1487805566"
                     this.user = user;
                     this.loaded = true;
                 },
-                (status, msg) => {
-                    this.load_error = true;
+                (status, msg, logged_out) => {
+                    if (logged_out) {
+                        window.timebank_event_bus.$emit('session-expired');
+                    } else {
+                        this.load_error = true;
+                    }
                 }
             );
 
@@ -205,9 +209,13 @@ user.login = "1487805566"
                         this.balance_loading = false;
                         this.user_balance = Timebank.hours_to_hour_minute_display(data.balance);
                     }, 
-                    (status, msg) => {
-                        this.balance_loading = false;
-                        this.user_balance = 'Error loading balance.';
+                    (status, msg, logged_out) => {
+                        if (logged_out) {
+                            window.timebank_event_bus.$emit('session-expired');
+                        } else {
+                            this.balance_loading = false;
+                            this.user_balance = 'Error loading balance.';
+                        }
                     }
                 );
             }

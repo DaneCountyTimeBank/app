@@ -240,9 +240,13 @@
 
                     if (active_query) this.old_search_query = active_query;
 
-                }, (status, msg) => {
+                }, (status, msg, logged_out) => {
 
-                    if (status === 404) { // TODO later: check via msg if possible..
+                    // msg is an array.. XXX: may want to standardize it to text..
+
+                    if (logged_out) {
+                        window.timebank_event_bus.$emit('session-expired');
+                    } else if (status === 404) { // TODO later: check via msg if possible..
 
                         // complete w/o loaded causes no posts found message to be displayed
                     } else {

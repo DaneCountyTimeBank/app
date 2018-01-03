@@ -457,13 +457,17 @@
                         this.user_name = user.name;
                         this.user_loaded = true;
                     },
-                    (status, msg) => {
+                    (status, msg, logged_out) => {
                         // really only 404's that might prevent an exchange if the user_id passed is invalid
                         // but all sort of other edge case errors too, eg.
                         //    can't connect to server to check user so user_id may be invalid or valid but can't know
                         // so just treat all user load errors the same
 
-                        this.load_error = 'user';
+                        if (logged_out) {
+                            window.timebank_event_bus.$emit('session-expired');
+                        } else {
+                            this.load_error = 'user';
+                        }
                     }
                 );
             } else {

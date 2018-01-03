@@ -59,6 +59,13 @@ function get_site_path() {
     return SITE_PATH;
 }
 
+function error_logged_out(status, msg) {
+    return status === 403 && (
+        msg.indexOf('Access restricted to logged in users') > -1 ||
+        msg.indexOf('Access denied for user anonymous') > -1
+    );
+}
+
 function logout(success, error) {
     user_logout({
         success: success,
@@ -101,7 +108,7 @@ function get_posts(args, success, error) {
             if (success) success(entities);
         },
         error: function(xhr, status, msg) {
-            if (error) error(status, msg);
+            if (error) error(status, msg, error_logged_out(status, msg));
         }
     });
 }
@@ -227,7 +234,7 @@ function get_user(user_id, success, error) {
         },
         error: function(xhr, status, msg) {
             //console.log('error get user', status, msg);
-            if (error) error(status, msg);
+            if (error) error(status, msg, error_logged_out(status, msg));
         }
     });
     /*
@@ -381,7 +388,7 @@ function delete_post(pid, success, error) {
             if (success) success();
         },
         error: function(xhr, status, msg) {
-            if (error) error(status, msg);
+            if (error) error(status, msg, error_logged_out(status, msg));
         }
     });
 }
@@ -424,7 +431,7 @@ function create_transaction(args, success, error) {
         },
         error: function(xhr, status, msg) {
             //log('entity creation error', status, msg);
-            if (error) error(status, msg);
+            if (error) error(status, msg, error_logged_out(status, msg));
         }
     });
 }
@@ -470,7 +477,7 @@ function get_transactions(args, success, error) {
             if (success) success(data);
         },
         error: function(xhr, status, msg) {
-            if (error) error(status, msg);
+            if (error) error(status, msg, error_logged_out(status, msg));
         }
     });
 }
@@ -554,7 +561,7 @@ function send_msg(args, success, error) {
             if (success) success(data);
         },
         error: function(xhr, status, message) {
-            if (error) error(status, message);
+            if (error) error(status, message, error_logged_out(status, message));
         }
     });
 }
@@ -613,7 +620,7 @@ function search_users(args, success, error) {
         },
         error: function(xhr, status, message) {
             //log('search users error', xhr, status, message);
-            if (error) error(status, message);
+            if (error) error(status, message, error_logged_out(status, message));
         }
     });
 }
@@ -777,12 +784,12 @@ function update_post(node_id, options, success, error) {
                 }
             },
             error: function(xhr, status, message) {
-                if (error) error(status, message);
+                if (error) error(status, message, error_logged_out(status, message));
             }
         });
 
     }, function(xhr, status, message){
-        if (error) error(status, message);
+        if (error) error(status, message, error_logged_out(status, message));
     });
 }
 
@@ -851,7 +858,7 @@ function create_post(options, success, error) {
         },
         error: function(xhr, status, message) {
             log('create error', xhr, status, message);
-            if (error) error(status, message);
+            if (error) error(status, message, error_logged_out(status, message));
         }
     });
 
@@ -1079,14 +1086,15 @@ function get_event(event_id, success, error) {
     }, error);
 }
 
-
 function get_events(args, success, error) {
 
     args = args_to_str(args);
 
     entity_index('event/index', args || '', {
         success: success,
-        error: error
+        error: function(xhr, status, msg) {
+            if (error) error(status, msg, error_logged_out(status, msg));
+        }
     });
 }
 

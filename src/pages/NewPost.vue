@@ -244,9 +244,14 @@
                             // not resetting form b/c still in edit mode
                             this.post_submitted = true; // triggers actionsheet to show
                         },
-                        (status, message) => {
+                        (status, message, logged_out) => {
                             this.$f7.hidePreloader();
-                            this.$f7.addNotification({message: 'Error updating - please try again later.', hold: 3500});
+
+                            if (logged_out) {
+                                window.timebank_event_bus.$emit('session-expired');
+                            } else {
+                                this.$f7.addNotification({message: 'Error updating - please try again later.', hold: 3500});
+                            }
                         }
                     );
                 } else {
@@ -263,9 +268,14 @@
                             this.resetForm();
                             this.post_submitted = true; // triggers actionsheet to show
                         },
-                        (status, message) => {
+                        (status, message, logged_out) => {
                             this.$f7.hidePreloader();
-                            this.$f7.addNotification({message: 'Error submitting - please try again later.', hold: 3500});
+
+                            if (logged_out) {
+                                window.timebank_event_bus.$emit('session-expired');
+                            } else {
+                                this.$f7.addNotification({message: 'Error submitting - please try again later.', hold: 3500});
+                            }
                         }
                     );
                 }
