@@ -29,7 +29,9 @@
             <template v-for="person in role.people">
                 {{person.name}}
                 &nbsp; <f7-link v-if="person.email" external :href="'mailto:' + person.email"><i class="material-icons">email</i></f7-link>
-                &nbsp; <f7-link v-if="person.phone" external :href="'tel:' + person.phone"><i class="material-icons">phone</i></f7-link>
+                <template v-if="person.phone">
+                    <br /><f7-link external :href="'tel:' + person.phone">{{person.phone_display}}</f7-link>
+                </template>
                 <br />
             </template>
             <br />
@@ -75,7 +77,7 @@
             {
                 title: 'Community Outreach Coordinator',
                 people: [
-                    {name: 'Gary Messinger', email: 'gary@danecountytimebank.org', phone: '6086307742'}
+                    {name: 'Gary Messinger', email: 'gary@danecountytimebank.org', phone: '6086307742', phone_display: '(608) 630-7742'}
                 ]
             },
             {
