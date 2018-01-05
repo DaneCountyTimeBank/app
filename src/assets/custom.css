@@ -20,3 +20,7 @@ XXX: for higher resolution devices, could use the large size image
     width: 100%;
     max-width: 480px;
 }
+
+.push-radio .item-title {
+    margin-top: 7px;
+}

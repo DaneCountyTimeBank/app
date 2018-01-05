@@ -68,7 +68,7 @@
 
         <template v-if="post_loaded && reply">
             <strong>Reply</strong>
-            <f7-list form>
+            <f7-list form class="inputs-list">
                 <f7-list-item>
                     <f7-input type="textarea" v-model="message" placeholder="Type a message here to send to the author of this post"></f7-input>
 

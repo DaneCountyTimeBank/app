@@ -9,7 +9,7 @@
       </f7-nav-center>
     </f7-navbar>
 
-    <f7-list form class="member-search-form">
+    <f7-list form class="member-search-form inputs-list">
         <f7-list-item>
             <f7-icon slot="media" class="search-icon"><i class="material-icons">search</i></f7-icon>
             

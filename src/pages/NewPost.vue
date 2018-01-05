@@ -16,11 +16,11 @@
         Error loading - please try again later.
     </f7-block>
 
-    <f7-list form v-if="loaded && !load_error">
+    <f7-list form v-if="loaded && !load_error" class="inputs-list">
       <f7-list-item group-title :title="header_text"></f7-list-item>
       <template v-if="!edit_post_id">
-        <f7-list-item v-model="post_type" class="new-post-radio" radio name="offer-want" value="offer" input-value="offer" title="Offering"></f7-list-item>
-        <f7-list-item v-model="post_type" class="new-post-radio" radio name="offer-want" value="want" input-value="want" title="Requesting"></f7-list-item>
+        <f7-list-item v-model="post_type" class="push-radio" radio name="offer-want" value="offer" input-value="offer" title="Offering"></f7-list-item>
+        <f7-list-item v-model="post_type" class="push-radio" radio name="offer-want" value="want" input-value="want" title="Requesting"></f7-list-item>
       </template>
 
       <f7-list-item>
@@ -326,8 +326,5 @@
 
 <style>
 
-.new-post-radio .item-title {
-    margin-top: 7px;
-}
 
 </style>

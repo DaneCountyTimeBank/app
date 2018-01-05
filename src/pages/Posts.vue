@@ -21,7 +21,7 @@
     </f7-block>
 
     <!-- TODO later: extract to a component -->
-    <f7-list form class="posts-search-form">
+    <f7-list form class="posts-search-form inputs-list">
         <f7-list-item>
             <f7-icon slot="media" class="search-icon"><i class="material-icons">search</i></f7-icon>
             

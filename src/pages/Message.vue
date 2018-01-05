@@ -21,7 +21,7 @@
     </f7-block>
 
     <!-- to get the right css to work, have to show the below on load w/o a v-if, otherwise it looks different when shown after loaded is set to true -->
-    <f7-list form v-if="!load_error">
+    <f7-list form v-if="!load_error" class="inputs-list">
         <f7-list-item>
             <f7-label>Subject</f7-label>
             <f7-input v-model.trim="subject" type="text" />

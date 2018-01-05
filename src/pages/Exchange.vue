@@ -26,7 +26,7 @@
             <a :href="user_id | profile_link">{{user_name}}</a>
             for "<a :href="post_id | post_link">{{description}}</a>".
         </f7-block>
-        <f7-list form>
+        <f7-list form class="inputs-list">
           <f7-list-item>
             <f7-label>Hours</f7-label>
             <f7-input v-model.trim="hours" type="text" placeholder="eg. 1:45"/>
@@ -44,9 +44,9 @@
         </f7-list>
     </template> <!-- form duplicated partially above b/c the description-hint below makes it hack to style the below form to appear like the above -->
     <template v-else>
-        <f7-list form>
-          <f7-list-item v-model="exchange_type" radio name="exchange-type" value="earned" input-value="earned" title="I earned"></f7-list-item>
-          <f7-list-item v-model="exchange_type" radio name="exchange-type" value="spent" input-value="spent" title="I spent"></f7-list-item>
+        <f7-list form class="inputs-list">
+          <f7-list-item v-model="exchange_type" class="push-radio" radio name="exchange-type" value="earned" input-value="earned" title="I earned"></f7-list-item>
+          <f7-list-item v-model="exchange_type" class="push-radio" radio name="exchange-type" value="spent" input-value="spent" title="I spent"></f7-list-item>
           <f7-list-item>
             <f7-label>Hours</f7-label>
             <f7-input v-model.trim="hours" type="text" placeholder="eg. 1:45"/>
@@ -59,7 +59,7 @@
         <div class="description-hint">
             Don't include names in your description as this information will be made public.
         </div>
-        <f7-list form>
+        <f7-list form class="inputs-list">
           <f7-list-item>
             <f7-label>With</f7-label>
             <f7-input v-model="user_name" :disabled="true" type="text" placeholder=""/>

@@ -10,7 +10,7 @@
 
     <f7-block-title>Login</f7-block-title>
 
-    <f7-list form>
+    <f7-list form class="inputs-list">
 
       <f7-list-item>
         <f7-input v-model="email" type="text" placeholder="Email"/>
