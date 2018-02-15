@@ -180,6 +180,9 @@ function timestamp_to_time(unix_timestamp) {
     if (hour > 12) {
         hour -= 12;
     }
+    if (hour === 0) { // b/c there is no 0am/pm
+        hour = 12;
+    }
 
     return hour + ':' + min + ' ' + postfix;
 }
@@ -187,5 +190,25 @@ function timestamp_to_time(unix_timestamp) {
 Vue.filter('timestamp_to_time', timestamp_to_time);
 
 
+function event_to_datetime_details(event) {
+    var start_date_str = timestamp_to_date(event.datetime_start),
+        start_time_str = timestamp_to_time(event.datetime_start),
+        out = start_date_str + '<br>' + start_time_str;
 
+    if (!event.datetime_end) {
+        return out;
+    }
+
+    var end_date_str = timestamp_to_date(event.datetime_end),
+        end_time_str = timestamp_to_time(event.datetime_end),
+        same_day = (start_date_str === end_date_str);
+
+    if (same_day) {
+        return out + ' - ' + end_time_str;
+    }
+    // this isn't going to look very good on the home page..
+    return out + '<br>to<br>' + end_date_str + '<br>' + end_time_str;
+}
+
+Vue.filter('event_to_datetime_details', event_to_datetime_details);
 

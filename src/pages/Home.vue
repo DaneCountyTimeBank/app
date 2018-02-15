@@ -51,10 +51,7 @@
                         {{item.title}}
                     </div>
                 </div>
-                <div class="item-text">
-                    {{item.date | timestamp_to_date}}<br />
-                    {{item.date | timestamp_to_time}}
-                </div>
+                <div class="item-text" v-html="$options.filters.event_to_datetime_details(item)"></div>
             </f7-list-item>
         </f7-list>
         <f7-block inner v-if="events.length === 0">

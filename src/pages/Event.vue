@@ -20,12 +20,9 @@
 
         <div class="event-body" v-html="event.body_html"></div>
 
-        <div class="event-block" v-if="event.date">
+        <div class="event-block" v-if="event.datetime_start">
             <i class="material-icons color-darkgreen">access_time</i>
-            <div>
-                {{event.date|timestamp_to_date}}<br />
-                {{event.date|timestamp_to_time}}
-            </div>
+            <div v-html="$options.filters.event_to_datetime_details(event)"></div>
         </div>
 
         <div class="event-block" v-if="event.details_html">

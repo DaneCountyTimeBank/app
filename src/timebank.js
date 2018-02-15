@@ -1,6 +1,6 @@
-/* global console Drupal node_save node_delete node_load user_login user_logout user_retrieve node_create entity_create entity_index node_index taxonomy_term_index system_connect */
+/* global console Drupal node_delete node_load user_login user_logout user_retrieve node_create entity_create entity_index node_index taxonomy_term_index system_connect */
 
-import { map, forIn, filter, get, property, trimEnd, sortBy } from "lodash";
+import { map, forIn, filter, get, property, trimEnd, sortBy, escape as htmlescape } from "lodash";
 
 import sanitizeHtml from 'sanitize-html';
 
@@ -86,6 +86,159 @@ function login(username_or_email, password, success, error) {
     });
 }
 
+
+var iso8601_numericKeys = [ 1, 4, 5, 6, 7, 10, 11 ];
+
+function iso8601_parse(date) {
+    var timestamp, struct, minutesOffset = 0;
+
+    // ES5 §15.9.4.2 states that the string should attempt to be parsed as a Date Time String Format string
+    // before falling back to any implementation-specific date parsing, so that’s what we do, even if native
+    // implementations could be faster
+    //              1 YYYY                2 MM       3 DD           4 HH    5 mm       6 ss        7 msec        8 Z 9 ±    10 tzHH    11 tzmm
+    if ((struct = /^(\d{4}|[+-]\d{6})(?:-(\d{2})(?:-(\d{2}))?)?(?:T(\d{2}):(\d{2})(?::(\d{2})(?:\.(\d{3}))?)?(?:(Z)|([+-])(\d{2})(?::(\d{2}))?)?)?$/.exec(date))) {
+        // avoid NaN timestamps caused by “undefined” values being passed to Date.UTC
+        for (var i = 0, k; (k = iso8601_numericKeys[i]); ++i) {
+            struct[k] = +struct[k] || 0;
+        }
+
+        // allow undefined days and months
+        struct[2] = (+struct[2] || 1) - 1;
+        struct[3] = +struct[3] || 1;
+
+        if (struct[8] !== 'Z' && struct[9] !== undefined) {
+            minutesOffset = struct[10] * 60 + struct[11];
+
+            if (struct[9] === '+') {
+                minutesOffset = 0 - minutesOffset;
+            }
+        }
+
+        timestamp = Date.UTC(struct[1], struct[2], struct[3], struct[4], struct[5] + minutesOffset, struct[6], struct[7]);
+    } else {
+        timestamp = Date.parse ? Date.parse(date) : NaN;
+    }
+
+    return timestamp;
+}
+
+
+function html2text(html) {
+    // may need to make this much more complicated based on the text found in post bodies..
+    //return html.replace(/<p>/g, '').replace(/<\/p>/g, '\n');
+    var el = document.createElement("div");
+    el.innerHTML = html;
+    return el.innerText || el.textContent || '';
+}
+
+function plaintext2html(text, tabstop, nofollow, noreferrer) {
+    if (tabstop === undefined) tabstop = 4;
+    if (nofollow === undefined) nofollow = 1;
+    if (noreferrer === undefined) noreferrer = 0;
+
+    // fix for linkifying links right after '\n ' or at beginning w/ a space
+    // kinda hacky by using a unicode character but somewhat easier than
+    // debugging the complex regex
+    text = text.replace(/(^|\n)([ ]+)http/gim, function(){
+        var txt = arguments[0],
+            out = txt[0] === '\n' ? '\n' : '';
+
+        for (var i = 0; i < arguments[2].length; ++i) {
+            out += '¦'; // broken bar unicode as a placeholder for space
+        }
+        out += ' http'; // adding an extra space that will be removed later
+        return out;
+    });
+
+    var plaintext_re = /([<&>])|(^[ \t]+)|(\r\n|\r|\n)|((^|\s|)(https?:\/\/[^\s)\]>*]+))(\s|$|\)|\]|>|\*)/gim,
+        space = '&nbsp;',
+        tab = '';
+    for (var i = 0; i < tabstop; ++i) { tab += space; }
+    
+    function do_sub(){
+        var arr = arguments;
+        if (arr[1]) {
+            return htmlescape(arr[1]);
+        } else if (arr[3]) {
+            return '<br />';
+        } else if (arr[2]) {
+            return arr[0].replace(/\t/g, tab).replace(/ /g, space);
+        } else if (arr[2] === '\t') {
+            return tab;
+        } else {
+            var url = arr[4],
+                prefix = '';
+            if (url.charAt(0) === ' ') {
+                prefix = ' ';
+                url = url.slice(1);
+            }
+            var last = arr[0][arr[0].length - 1]; // last char in full match
+            if (['\n', '\r', '\r\n'].indexOf(last) > -1) {
+                last = '<br />';
+            } else if (last === ' ') {
+                // leave it be
+            } else {
+                last = '';
+            }
+            var display_url = url;
+            if (url.length > 78) {
+                display_url = url.slice(0, 75) + '...';
+            }
+            var nf = 'rel="nofollow"';
+            if (!nofollow) nf = '';
+            if (noreferrer) nf += ' rel="noreferrer"';
+
+            return prefix + '<a target="_blank" rel="external" href="'+url+'" '+nf+'>'+display_url+'</a>'+last;
+        }
+    }
+    return text.replace(plaintext_re, do_sub).replace(/¦ /g, '¦').replace(/¦/g, space);
+}
+
+
+function cleanup_html(html, user_submitted) {
+
+    html = sanitizeHtml(
+        html,
+        {
+            allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img', 'span']),
+            //allowedAttributes: ,
+            allowedAttributes: {
+                a: ['href', 'name', 'target'],
+                img: ['src', 'alt', 'width', 'height', 'max-width', 'max-height'], // style max-width, max-height
+                div: ['style'],
+                p: ['style'],
+                span: ['style'],
+            },
+            allowedStyles: {
+                '*': {
+                    // don't allow user submitted content to change the color or font-size
+                    // (b/c they could make it too small or too light such that it is unreadable)
+                    'color': [user_submitted ? /^$/ : /.*/],
+                    'font-size': [user_submitted ? /^$/ : /^(?!12px)(.*)$/], // 12px is too small on mobile // https://stackoverflow.com/questions/2078915/a-regular-expression-to-exclude-a-word-string
+                    'font-weight': [/.*/],
+                    'text-decoration': [/.*/],
+                    'font-style': [/.*/],
+                    'text-decoration-line': [/.*/],
+                    'text-align': [/.*/],
+                }
+            }
+
+        }
+    );
+
+    // XXX: not sure if we should allow iframes..
+    // <iframe allowfullscreen="" frameborder="0" height="360" mozallowfullscreen="" src="https://player.vimeo.com/video/147421311" webkitallowfullscreen="" width="640"></iframe>
+
+    // could use a sanitizeHTML transformation to more cleanly make this change.. https://github.com/punkave/sanitize-html
+    html = trimEnd(html.replace(/<a /g, '<a class="link external" target="_blank" ')); // very naive implementation..
+
+    // remove paragraph based whitespace
+    html = trimEnd(html).replace(/(\s+<p>(\s|&nbsp;)+<\/p>)+$/g, ''); 
+
+    return html;
+}
+
+
 function args_to_str(args) {
     return Object.keys(args).map((k) => encodeURIComponent(k) + '=' + encodeURIComponent(args[k])).join('&');
 }
@@ -112,22 +265,6 @@ function get_posts(args, success, error) {
         }
     });
 }
-
-function post_set_categories(post_id, category_ids, success, error) {
-    // categories is comma delimeted string of category ids, eg.  581,556,550
-    Drupal.services.call({
-        method: 'PUT',
-        path: 'post/set-categories.json',
-        data: JSON.stringify({post_id: post_id, category_ids: category_ids}),
-        success: function(result) {
-            if (success) success();
-        },
-        error: function(xhr, status, message) {
-            if (error) error(status, message);
-        }
-    });
-}
-
 
 /*
 function get_propositions(success) { 
@@ -361,20 +498,34 @@ function get_post(pid, success, error) {
             }
         }
 
+        // support newer field and older field
+        var end = get(node, 'field_expiration_date.und[0].value', '');
+        if (end) {
+            // newer field is stored as a string, eg. 2018-12-21 00:00:00
+            end = (new Date(end)).getTime() / 1000; 
+        } else if (node.end) {
+            // older field is stored as a unix timestamp
+            end = 1 * node.end;
+        }
+
         var post = {
             post_id: node.nid,
             type: node.want === '1' ? 'want' : 'offer',
             title: node.title,
             body: cleanup_html(get(node, 'body.und[0].safe_value', ''), true),
-            text_body: get(node, 'body.und[0].value'),
+            text_body: html2text(get(node, 'body.und[0].value')),
             changed: 1 * node.changed,
             created: 1 * node.created,
-            end: 1 * node.end,
+            end: end,
             image: img,
             user_name: node.name,
             user_id: node.uid,
             categories: categories // as array of {id:, name:} objects
         };
+
+        if (!post.body) {
+            post.body = plaintext2html(post.text_body); // .replace(/\n\n/g, '<br>');
+        }
 
         //console.log('n end');
 
@@ -713,83 +864,33 @@ function get_post_categories(success, error) {
     });
 }
 
-function date_to_object(date_str) {
-    
-    // date_str in format 2018-12-30
-
-    // JS Date always counts month starting from 0, January = 0, December = 11
-
-    var [year, month, day] = date_str.split('-');
-    /*
-        date = new Date(year, month - 1, day),
-        day_ms = 24 * 3600 * 1000,
-        timestamp_ms = date.getTime() + day_ms,
-        date2 = new Date(timestamp_ms);
-
-    month = date2.getMonth() + 1;
-    day = date2.getDate();
-    year = date2.getFullYear();
-    */
-
-    //console.log('given', date_str, 'js date', date, 'timestamp ms', timestamp_ms, 'js date 2', date2, 'returning', year, month, day);
-
-    return {month: month, day: day, year: year};
-}
-
-function update_post(node_id, options, success, error) {
-
-    // XXX: doesn't currently support changing the post type (which is passed as options.type)
-    //      not sure if node_save supports this or if it's just that I haven't found the correct way to do it yet
-    //      (b/c the desktop site doesn't have the option to change a posts type when editing the post)
+function update_post(post_id, options, success, error) {
 
     // TODO later: support editing the image
 
-    // XXX: could speed up by getting node earlier than at update submission..
+    var args = {
+        post_id: post_id,
+        type: options.type, // offer | want
+        title: options.title,
+        body: options.body,
+        end_date: options.end_date, // eg. '2018-12-30'
+        category_ids: options.category_ids.join(','), // [1,2,3]
+    };
 
-    get_node(node_id, function(node) {
+    Drupal.services.call({
+        method: 'PUT',
+        path: 'post/update.json',
+        data: JSON.stringify(args),
+        success: function(result) {
 
-        // updating stopped working b/c of a problem w/ this field
-        // but deleting the field seems to work..
-        delete node.field_offer_request; 
+            // need to delete cache so the post will be refetched with updated values
+            delete localStorage['node_' + post_id];
 
-        node.title = options.title;
-        if (node.body.und && node.body.und[0]) { // body may not be set if empty
-            node.body.und[0].value = options.body;
-        } else {
-            node.body = {und: [{value: options.body}]};
+            if (success) success();
+        },
+        error: function(xhr, status, message) {
+            if (error) error(status, message, error_logged_out(status, message));
         }
-        node.end = date_to_object(options.end_date);
-
-        var old_category_ids = [],
-            categories = sortBy(options.category_ids).join(','),
-            old_categories,
-            set_categories;
-
-        map(node.offers_wants_categories.und, function(x){
-            old_category_ids.push(x.tid);
-        });
-
-        old_categories = sortBy(old_category_ids).join(',');
-
-        set_categories = (categories !== old_categories);
-
-        node_save(node, {
-            success: function(result) {
-                if (set_categories) {
-                    post_set_categories(node_id, categories, function(){
-                        if (success) success();
-                    }, error);
-                } else {
-                    if (success) success();
-                }
-            },
-            error: function(xhr, status, message) {
-                if (error) error(status, message, error_logged_out(status, message));
-            }
-        });
-
-    }, function(xhr, status, message){
-        if (error) error(status, message, error_logged_out(status, message));
     });
 }
 
@@ -807,8 +908,7 @@ function create_post(options, success, error) {
     //             and could just upload to non-drupal at first
     //             probably just need to use file_create from jdrupal
 
-    var [first_category, ...other_categories] = options.category_ids,
-        categories = options.category_ids.join(','),
+    var first_category = options.category_ids[0],
         node = {
             type: 'proposition',
             title: options.title,
@@ -816,7 +916,7 @@ function create_post(options, success, error) {
                 und: [{value: options.body}]
             },
             want: options.type === 'offer' ? '0' : '1',
-            end: date_to_object(options.end_date)
+            
             // image: {und: [fid: "1120"]} // fid = file id?  (and  display: '1' & upload: null  show up in args copied below)
     };
 
@@ -841,20 +941,23 @@ function create_post(options, success, error) {
             // full node doesn't come back, just
             // {nid: "16132", uri: "https://timebank-testsite.org/rest/node/16132"}
 
-            var node_id = new_node['nid'];
+            var node_id = new_node.nid;
 
-            if (other_categories) {
+            // use update post to set the categories and the expiration
+            // b/c can't make adding multiple categories work at creation
+            // or setting the expiration
+            var update_args = {
+                type: options.type,
+                title: options.title,
+                body: options.body,
+                end_date: options.end_date,
+                category_ids: options.category_ids
+            };
 
-                post_set_categories(node_id, categories, function(){
-                    if (success) success(node_id);
-                }, error);
-
-                // XXX: ideally all categories could be added at creation but couldn't get that to work
-                //      so all extra categories have to be added post creation..
-                //add_other_categories(node_id, other_categories);
-            } else {
+            update_post(node_id, update_args, function(){
                 if (success) success(node_id);
-            }
+            }, error);
+
         },
         error: function(xhr, status, message) {
             log('create error', xhr, status, message);
@@ -864,54 +967,6 @@ function create_post(options, success, error) {
 
 }
 
-/*
-function category_adder(node_id, category_ids, cb) {
-    // returns a function that adds the given category to the given node
-    // and calls the given callback when done successfully
-    return function() {
-        get_node(node_id, function(node){
-
-            for (var category_id of category_ids) {
-                node['offers_wants_categories']['und'].push({tid: category_id});
-            }
-
-            node_save(node, {
-                success: function(result){
-                    cb();
-                }, 
-                error: function(xhr, status, msg){
-                    // not handling for now..
-                }
-            });
-
-        }, function(status, msg){
-            // not handling for now ..
-        });
-    };
-}
-*/
-/*
-function add_other_categories(node_id, other_categories) {
-    // we can only add one category at a time
-    // so we create a list of functions each of which will add a specific category
-    // and then execute them sequentially
-
-    var funcs = [],
-        cb = function() {
-            if (funcs.length > 0) {
-                var f = funcs.pop();
-                f();
-            }
-        };
-
-    //funcs.push(category_adder(node_id, other_categories, cb)); // doesn't work for whatever reason
-
-    for (var category_id of other_categories) {
-        funcs.push(category_adder(node_id, [category_id], cb));
-    }
-    cb();
-}
-*/
 
 //import { sortBy, reverse, property } from "lodash";
 // to best import lodash, see
@@ -1054,14 +1109,46 @@ function get_event(event_id, success, error) {
             body_html: get_node_body(event),
         };
 
-        evt.date = (function () {
-            var dt = null,
-                dt_data = get(event, 'event_date.und[0].value');
-            if (dt_data) {
-                dt = 1 * dt_data;
+        if (event.field_date_recurring) { // DCTB specific
+
+            // event.field_date_recurring: {"und":[{"value":"2018-02-15T19:00:00","value2":"2018-02-15T20:00:00","timezone":"America/Chicago","timezone_db":"UTC","date_type":"date"},
+            //
+            // und is an array of dates, in order from oldest date to newest
+            // the oldest date may be in the past though
+            // 
+            // and value & value2 are in UTC, so they need to be converted to local time
+
+            var dates = event.field_date_recurring.und,
+                now = (new Date()).getTime();
+
+            // get each date that is in the future
+            var future_dates = filter(dates, function(x){
+                // event hasn't ended yet
+                return iso8601_parse(x.value2) > now;
+            });
+
+            var show_date;
+            if (future_dates.length) {
+                show_date = future_dates[0];
+            } else {
+                // no future dates, use the newest of the old dates
+                show_date = dates[dates.length - 1];
             }
-            return dt;
-        }());
+
+            // convert date/times to local timestamp via iso8601_parse(x.value) (which returns milliseconds)
+            evt.datetime_start = iso8601_parse(show_date.value) / 1000; // ms to seconds
+            evt.datetime_end = iso8601_parse(show_date.value2) / 1000;
+
+        } else { // old event_date field 
+            evt.datetime_start = (function () {
+                var dt = null,
+                    dt_data = get(event, 'event_date.und[0].value');
+                if (dt_data) {
+                    dt = 1 * dt_data;
+                }
+                return dt;
+            }());
+        }
 
         evt.details_html = (function () {
             var addr = get(event, 'field_event_street_address.und[0].safe_value'),
@@ -1091,7 +1178,16 @@ function get_events(args, success, error) {
     args = args_to_str(args);
 
     entity_index('event/index', args || '', {
-        success: success,
+        success: function(data) {
+
+            data.events = map(data.events, function(evt){
+                evt.datetime_start = iso8601_parse(evt.datetime_start) / 1000; // TODO: extract
+                evt.datetime_end = iso8601_parse(evt.datetime_end) / 1000;
+                return evt;
+            });
+
+            if (success) success(data);
+        },
         error: function(xhr, status, msg) {
             if (error) error(status, msg, error_logged_out(status, msg));
         }
@@ -1131,50 +1227,6 @@ function get_stories(num, success, error) {
 // http://danecountytimebank.org/join
 // http://danecountytimebank.org/timebanking
 // http://danecountytimebank.org/faq
-
-
-function cleanup_html(html, user_submitted) {
-
-    html = sanitizeHtml(
-        html,
-        {
-            allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img', 'span']),
-            //allowedAttributes: ,
-            allowedAttributes: {
-                a: ['href', 'name', 'target'],
-                img: ['src', 'alt', 'width', 'height', 'max-width', 'max-height'], // style max-width, max-height
-                div: ['style'],
-                p: ['style'],
-                span: ['style'],
-            },
-            allowedStyles: {
-                '*': {
-                    // don't allow user submitted content to change the color or font-size
-                    // (b/c they could make it too small or too light such that it is unreadable)
-                    'color': [user_submitted ? /^$/ : /.*/],
-                    'font-size': [user_submitted ? /^$/ : /.*/],
-                    'font-weight': [/.*/],
-                    'text-decoration': [/.*/],
-                    'font-style': [/.*/],
-                    'text-decoration-line': [/.*/],
-                    'text-align': [/.*/],
-                }
-            }
-
-        }
-    );
-
-    // XXX: not sure if we should allow iframes..
-    // <iframe allowfullscreen="" frameborder="0" height="360" mozallowfullscreen="" src="https://player.vimeo.com/video/147421311" webkitallowfullscreen="" width="640"></iframe>
-
-    // could use a sanitizeHTML transformation to more cleanly make this change.. https://github.com/punkave/sanitize-html
-    html = trimEnd(html.replace(/<a /g, '<a class="link external" target="_blank" ')); // very naive implementation..
-
-    // remove paragraph based whitespace
-    html = trimEnd(html).replace(/(\s+<p>(\s|&nbsp;)+<\/p>)+$/g, ''); 
-
-    return html;
-}
 
 
 
@@ -1224,8 +1276,6 @@ module.exports = {
 
     hour_minute_display: hour_minute_display,
     hours_to_hour_minute_display: hours_to_hour_minute_display,
-
-    //cleanup_html: cleanup_html,
 
     get_site_path: get_site_path,
 
