@@ -235,6 +235,10 @@ function cleanup_html(html, user_submitted) {
     // remove paragraph based whitespace
     html = trimEnd(html).replace(/(\s+<p>(\s|&nbsp;)+<\/p>)+$/g, ''); 
 
+    // remove unicode whitespace which acts like &nbsp;'s and causes weird spacing
+    // https://stackoverflow.com/questions/16416610/replace-unicode-space-characters#16416631
+    html = html.replace(/[ \u00A0]{2,}/g, ' ');
+
     return html;
 }
 
@@ -920,8 +924,12 @@ function create_post(options, success, error) {
             // image: {und: [fid: "1120"]} // fid = file id?  (and  display: '1' & upload: null  show up in args copied below)
     };
 
+
     if (first_category) {
-        node.offers_wants_categories = {und: [{tid: first_category}]};
+        // old way that used to work
+        //node.offers_wants_categories = {und: [{tid: first_category}]};
+
+        node.offers_wants_categories = {und: [first_category]};
 
         /*
         offers_wants_categories: {
