@@ -46,7 +46,7 @@
                     <strong>{{above_no_results_text}}</strong>
                     <br /><br />
                 </div>
-                {{no_results_text}}
+                <div class="no-results-text" v-html="no_results_text"></div>
             </div>
             <div slot="no-more">
                 <br />
@@ -60,8 +60,10 @@
 
 <script>
 
+    import { debounce } from '../utils';
     import Timebank from '../timebank';
     import InfiniteLoading from 'vue-infinite-loading';
+    import { escape as htmlescape } from "lodash";
 
     /*
 
@@ -73,26 +75,11 @@
 
     */
 
-    function debounce(func, wait, immediate) {
-        var timeout;
-        return function() {
-            var context = this, args = arguments;
-            var later = function() {
-                timeout = null;
-                if (!immediate) func.apply(context, args);
-            };
-            var callNow = immediate && !timeout;
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-            if (callNow) func.apply(context, args);
-        };
-    }
-
     export default {
         name: 'Members',
         data () {
 
-            var instructions_txt = 'Type a name in the field above to search.',
+            var instructions_txt = "Type a name in the field above to search.<br><br>For example, type 'a' to find members whose first or last name starts with the letter 'A'.",
                 member_exchange = (this.$route.path === '/members/exchange');
 
             return {
@@ -110,7 +97,7 @@
         },
         computed: {
             no_matches_text () {
-                return 'No members matching "' + this.search_query + '" found';
+                return 'No members matching "' + htmlescape(this.search_query) + '" found';
             }
         },
         components: {
@@ -134,6 +121,10 @@
             },
 
             searchMembers (start) {
+
+                // TODO: switch to solr search and support filters?
+                //       but I don't like the weighting, details are weighted over the names so hard to find people by name..
+                //       and a search for 'rach' doesn't return rachels..
 
                 var active_query = this.search_query,
                     same_query = (active_query === this.old_search_query);
@@ -207,7 +198,7 @@
 
                     window.Dom7('.member-search-form .reset-search').addClass('active');
 
-                    if (this.search_query.length >= 2) {
+                    if (this.search_query.length >= 1) {
                         this.resetMembers();
                     }
 
@@ -298,6 +289,10 @@
 
 .member-search-form.list-block .item-media {
     min-width: 26px;
+}
+
+.no-results-text {
+    padding: 0 15px;
 }
 
 </style>
