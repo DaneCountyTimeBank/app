@@ -89,6 +89,11 @@
         />
     </f7-list>
 
+    <f7-block inner>
+        <f7-button href="https://danecountytimebank.org/donate" :external="true" target="_blank" class="button button-fill button-raised" color="red" style="max-width:320px;">
+            Donate to Dane County TimeBank
+        </f7-button>
+    </f7-block>
 
   </f7-page>
 </template>
