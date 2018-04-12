@@ -107,7 +107,8 @@
 }
 
 .event-body p {
-    margin: 0;
+    margin-left: 0;
+    margin-right: 0;
 }
 
 .event-body {
