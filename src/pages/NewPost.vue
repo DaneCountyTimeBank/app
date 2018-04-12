@@ -40,7 +40,7 @@
 
       <f7-list-item>
         <f7-label>Expires</f7-label>
-        <improved-datepicker v-model="end_date" :min-date="min_date"></improved-datepicker>
+        <improved-datepicker v-model="end_date" :min-date="min_date" :max-date="max_date"></improved-datepicker>
       </f7-list-item>
 
       <f7-list-item>
@@ -76,11 +76,9 @@
         name: 'NewPost',
         data () {
             var now_ms = (new Date()).getTime(),
-                year_from_now_ms = now_ms + (365*24*3600*1000),
+                year_from_now_ms = now_ms + (364*24*3600*1000), // minus 1 day b/c a year is the max
 
                 edit_post_id = this.$route.params.post_id,
-
-                end_time_ms = year_from_now_ms,
 
                 wording = 'Offer / Request',
 
@@ -89,14 +87,15 @@
 
                     title: (edit_post_id ? 'Edit' : 'List') + ' ' + wording,
                     display_categories: null,
-                    min_date: new Date(), // don't allow selecting a date before today
+                    min_date: new Date(now_ms + 24*3600), // don't allow selecting a date before tomorrow
+                    max_date: new Date(year_from_now_ms),
 
                     header_text: 'I am..',
                     post_type: '',
                     post_title: '',
                     details: '',
                     category_ids: [],
-                    end_date: new Date(end_time_ms), // works for initial assignment but doesn't track datepicker changes
+                    end_date: new Date(year_from_now_ms), // works for initial assignment but doesn't track datepicker changes
 
                     post_submitted: false,
                     new_post_id: null,
@@ -204,6 +203,10 @@
                     err = 'Please select whether you are offering or requesting something.';
                 } else if (!this.post_title) {
                     err = 'Please enter a title.';
+                } else if (!this.details) {
+                    err = 'Please enter some details.';
+                } else if (this.details.split(' ').length < 3) {
+                    err = 'Please enter more details.';
                 } else if (!end_date_str) {
                     err = 'Please enter an expiration date.';
                 } else if (this.category_ids.length === 0) {
