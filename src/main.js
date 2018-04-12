@@ -1,4 +1,4 @@
-/* global window document f7 */
+/* global window document */
 
 import 'babel-polyfill';
 
@@ -14,6 +14,8 @@ import App from './App';
 
 import ImprovedSelect from './components/ImprovedSelect';
 import ImprovedDatepicker from './components/ImprovedDatepicker';
+
+import { debounce } from './utils';
 
 
 // modifying the smart select template to add Cancel/Done buttons
@@ -83,6 +85,8 @@ Vue.use(Framework7Vue);
 Vue.component('improved-select', ImprovedSelect);
 Vue.component('improved-datepicker', ImprovedDatepicker);
 
+var right_panel_breakpoint = 1100;
+
 // Init App
 // https://framework7.io/docs/init-app.html
 new Vue({ // eslint-disable-line no-new
@@ -99,7 +103,10 @@ new Vue({ // eslint-disable-line no-new
     animateNavBackIcon: window.isiOS,
     pushState: true,
     pushStateNoAnimation: true,
+    
     panelLeftBreakpoint: 960,
+    panelRightBreakpoint: right_panel_breakpoint,
+
     preloadPreviousPage: false, // needed to fix iOS going back showing page offset w/ black bar on left and page-on-left class applied erroneously..
     // test swiping to go back a page, may not work if preloadPreviousPage is false..
     // may also want to add 'swipeBackPage: false' if swiping back opens left panel instead of previous page and causes issues..
@@ -125,11 +132,11 @@ function handleBackButton () {
   // Close modals
   // @TODO How to handle modals we shouldn't close like a login-screen?
   if (document.querySelector('.modal-in')) {
-    return f7.closeModal();
+    return window.f7.closeModal();
   }
   // If we have a back button, we want it to go back
-  if (f7.mainView.history.length > 1) {
-    return f7.mainView.router.back();
+  if (window.f7.mainView.history.length > 1) {
+    return window.f7.mainView.router.back();
   }
   // Default to closing the app
   return window.navigator.app.exitApp();
@@ -212,3 +219,73 @@ function event_to_datetime_details(event) {
 
 Vue.filter('event_to_datetime_details', event_to_datetime_details);
 
+
+(function(){
+
+    var right_panel = window.Dom7('.panel-right'),
+        left_panel = window.Dom7('.panel-left'),
+        views = window.Dom7('.views')[0],
+        current_page = null;
+
+    function hide_panel(panel) {
+        if (panel.hasClass('panel-visible-by-breakpoint')) {
+            panel.removeClass('panel-visible-by-breakpoint');
+
+            if (panel === right_panel) {
+                views.style.marginRight = '';
+            } else {
+                views.style.marginLeft = '';
+            }
+        }
+    }
+
+    function show_panel(panel) {
+        if (!panel.hasClass('panel-visible-by-breakpoint') && window.innerWidth >= right_panel_breakpoint) {
+            panel.addClass('panel-visible-by-breakpoint');
+
+            if (panel === right_panel) {
+                views.style.marginRight = '260px'; // this is what framework7 hardcodes it to
+            } else {
+                views.style.marginLeft = '260px';
+            }
+        }
+    }
+
+    function handle_panels() {
+        if (current_page !== 'posts') {
+            hide_panel(right_panel);
+        } else {
+            show_panel(right_panel);
+        }
+
+        if (current_page !== 'login') {
+            show_panel(left_panel);
+        } else {
+            hide_panel(left_panel);
+        }
+
+    }
+
+    window.addEventListener('resize', debounce(function(){
+        handle_panels();
+    }, 20));
+
+    window.addEventListener("orientationchange", function(){
+        handle_panels();
+    });
+
+    window.f7.onPageInit('*', (pg) => {
+        current_page = pg.name;
+        handle_panels();
+    });
+
+    window.f7.onPageReinit('*', (pg) => {
+        current_page = pg.name;
+        handle_panels();
+    });
+
+    if (window.location.pathname === '/') {
+        hide_panel(right_panel);
+    }
+
+})();

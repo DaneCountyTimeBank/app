@@ -9,10 +9,9 @@
           {{ title }}
       </f7-nav-center>
       <f7-nav-right>
-          <f7-link icon="icon-search"> <!--  open-panel="right" -->
-              <!-- <i class="material-icons">search</i> XXX: could display this once the search field is hidden from view -->
-              <i v-if="false && !user_id" class="material-icons" alt="Post filters">tune</i> <!-- filter_list more_virt more_horiz  -->
-          </f7-link>
+        <f7-link open-panel="right">
+            <i class="material-icons">filter_list</i>
+        </f7-link>
       </f7-nav-right>
     </f7-navbar>
 
@@ -32,6 +31,13 @@
             </f7-icon>
         </f7-list-item>
     </f7-list>
+
+    <f7-block v-if="facet_selections.length" class="active-filters">
+        <f7-link open-panel="right">{{filter_message}}</f7-link>
+        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
+        <f7-link @click="clearFilters">Clear Filters</f7-link>
+    </f7-block>
+
 
     <f7-list media-list class="post-list">
         <f7-list-item v-if="exchange" @click="selectPost(null)" title="Custom" class="custom-exchange">
@@ -70,6 +76,7 @@
 
 <script>
 
+    import { debounce } from '../utils';
     import Timebank from '../timebank';
     import InfiniteLoading from 'vue-infinite-loading';
     // https://peachscript.github.io/vue-infinite-loading/#!/events
@@ -91,11 +98,9 @@
     android icons (ditto)
         https://material.io/icons/
 
-    
 
-    TODO later: filtering via a right panel (categories, locations, people, organizations)
+    TODO: allow creating & managing saved searches
 
-          https://peachscript.github.io/vue-infinite-loading/#!/getting-started/with-filter
 
     TODO later: get image thumbnails in listing view
          (will probably requires editing PHP code / maybe creating a new module to return the image thumbnails)
@@ -103,21 +108,6 @@
     TODO later: make clicking search icon focus on search
 
     */
-
-    function debounce(func, wait, immediate) {
-        var timeout;
-        return function() {
-            var context = this, args = arguments;
-            var later = function() {
-                timeout = null;
-                if (!immediate) func.apply(context, args);
-            };
-            var callNow = immediate && !timeout;
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-            if (callNow) func.apply(context, args);
-        };
-    }
 
     export default {
         name: 'Posts',
@@ -155,8 +145,11 @@
                 exchange: exchange,
                 title: title,
                 infinite: {loaded: () => {}, complete: () => {}, reset: () => {}},
+                facet_selections: [],
+                filter_message: ''
             };
         },
+
         created () {
             if (!this.$root.view_user_name && this.user_id) {
                 Timebank.get_user(
@@ -166,6 +159,13 @@
                     }
                 );
             }
+
+            window.timebank_event_bus.$on('facets-updated', (facet_selections) => {
+                this.facet_selections = facet_selections;
+                this.filter_message = (this.facet_selections.length === 1) ? '1 Filter Active' : this.facet_selections.length + ' Filters Active';
+                this.resetPosts();
+            });
+
         },
         components: {
             InfiniteLoading,
@@ -177,9 +177,16 @@
 
         methods: {
 
+            resetFacets() {
+                this.facet_selections = [];
+                window.timebank_event_bus.$emit('new-facet-data', [], []);
+            },
+
             resetPosts () {
                 this.posts = [];
                 this.infinite.reset();
+
+                // window.timebank_event_bus // resetfilters
             },
 
             onPullToRefresh () {
@@ -214,7 +221,14 @@
                     args.query = this.search_query;
                 }
 
+                if (this.facet_selections.length) {
+                    args.facets = JSON.stringify(this.facet_selections);
+                }
+
                 Timebank.get_posts(args, data => {
+
+                    // XXX: could add photos to the list display like member search shows photos?
+                    //      but not much space and not as relevant as the title
 
                     for (var p of data.posts) {
                         if (this.user_id) {
@@ -239,6 +253,10 @@
                     }
 
                     if (active_query) this.old_search_query = active_query;
+
+                    if (start === 0) {
+                        window.timebank_event_bus.$emit('new-facet-data', data.facets, this.facet_selections);
+                    }
 
                 }, (status, msg, logged_out) => {
 
@@ -270,6 +288,7 @@
 
                     window.Dom7('.posts-search-form .reset-search').removeClass('active');
 
+                    this.resetFacets();
                     this.resetPosts();
 
                 } else {
@@ -277,12 +296,17 @@
                     window.Dom7('.posts-search-form .reset-search').addClass('active');
 
                     if (this.search_query.length >= 2) {
+                        this.resetFacets();
                         this.resetPosts();
                     }
 
                 }
 
             }, 250),
+
+            clearFilters () {
+                window.timebank_event_bus.$emit('reset-facets');
+            },
 
             clearSearch () {
                 //console.log('clearing search');
@@ -321,6 +345,12 @@
 .custom-exchange .item-title-row {
     font-style: italic;
     color: green;
+}
+
+.active-filters {
+    margin-top: 10px !important;
+    margin-bottom: 10px !important;
+    margin-left: 58px;
 }
 
 .showing-posts-header {

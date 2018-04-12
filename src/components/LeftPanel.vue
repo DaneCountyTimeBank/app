@@ -1,6 +1,15 @@
 <template>
   <f7-panel left :reveal="isiOS" :cover="isMaterial">
-    <f7-navbar :title="logged_in ? 'Menu' : ''"></f7-navbar>
+    <f7-navbar v-if="logged_in">
+      <f7-nav-left >
+        <i class="material-icons docked-icon">menu</i>
+      </f7-nav-left>
+      <f7-nav-center>
+        Menu
+      </f7-nav-center>
+    </f7-navbar>
+
+
     <f7-page>
       <template v-if="logged_in">
       <f7-list>
@@ -185,31 +194,39 @@
     height: auto;
   }
 
-  @media (min-width: 960px) {
-    .panel.panel-left {
-      border-right: 12px solid #f4f4f4;
-    }
-  }
-
   .list-group-title {
     height: 16px;
   }
   .list-block {
     margin-top: 5px;
   }
-  /*
-  .android .list-block {
-    margin-top: 5px;
-  }
-  .ios .list-block {
-    margin-top: 0;
-  }
-  */
 
+  @media (min-width: 960px) {
+    .panel.panel-left {
+      border-right: 12px solid #f4f4f4;
+    }
+  }
+  
 </style>
 
 <style>
-  .panel-left .list-block .item-media+.item-inner {
+
+.panel-left .list-block .item-media+.item-inner {
     margin-left: 10px;
-  }
+}
+
+.panel-left .docked-icon {
+    padding-left: 12px;
+}
+.panel-left .navbar .center {
+    padding-left: 14px;
+}
+
+@media (min-width: 960px) {
+    /* hide panel-opener button when left panel is visible */
+    .view-main .navbar .left .open-panel {
+        display: none;
+    }
+}
+
 </style>
