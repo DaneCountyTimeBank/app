@@ -17,11 +17,11 @@
       </f7-list-item>
 
       <f7-list-item>
-        <f7-input v-model="password" type="password" placeholder="Password"/>
+        <f7-input class="login-password" type="password" placeholder="Password"/>
       </f7-list-item>
 
       <f7-list-item>
-        <f7-button @click="login()" class="button button-fill button-raised">Login</f7-button>
+        <f7-button @click="login()" class="button button-fill button-raised" style="max-width:120px;">Login</f7-button>
       </f7-list-item>
 
     </f7-list>
@@ -38,6 +38,12 @@
         <strong>To join the Dane County TimeBank</strong>, 
         <f7-link external  href="mailto:join@danecountytimebank.org?subject=Joining%20Dane%20County%20TimeBank">email us</f7-link>
         or call <f7-link external href="tel:6086630400">(608) 663-0400</f7-link>
+    </f7-block>
+
+    <f7-block inner>
+        <f7-button href="https://danecountytimebank.org/donate" :external="true" target="_blank" class="button button-fill button-raised" color="red" style="max-width:320px;">
+            Donate to Dane County TimeBank
+        </f7-button>
     </f7-block>
 
     <f7-block-title>Contact Us</f7-block-title>
@@ -57,8 +63,7 @@
         data () {
             return {
                 title: 'Login Page',
-                email: '',
-                password: ''
+                email: ''
             };
         },
 
@@ -68,9 +73,13 @@
 
                 this.$f7.showPreloader('Logging in..');
 
+                // some password managers change the value in a way that Vue's v-model doesn't pick up the change
+                // so we just manually fetch it from the DOM
+                var password = window.Dom7('.login-password input', this.$el)[0].value;
+
                 Timebank.login(
                     this.email,
-                    this.password,
+                    password,
                     user_id => {
                         localStorage.user_id = user_id;
                         window.timebank_event_bus.$emit('login');
