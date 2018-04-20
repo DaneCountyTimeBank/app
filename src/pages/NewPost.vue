@@ -211,6 +211,8 @@
                     err = 'Please enter an expiration date.';
                 } else if (this.category_ids.length === 0) {
                     err = 'Please select at least one category.';
+                } else if (this.category_ids.length > 3) {
+                    err = 'Please select fewer categories (max 3).';
                 } else {
                     var now_str = this.dateToString(new Date());
 
