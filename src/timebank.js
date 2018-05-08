@@ -324,9 +324,12 @@ function _user(user) {
     if (addr_info) {
         addr_info = addr_info[0];
     }
+
+    var show_thoroughfare = get(user, 'field_list_my_street_address_on_.und[0].value') === '1';
+
     if (addr_info) {
         user.location = {
-            street: addr_info.thoroughfare,
+            street: show_thoroughfare ? addr_info.thoroughfare : '',
             area: addr_info.dependent_locality,
             city: addr_info.locality,
             postal_code: addr_info.postal_code
