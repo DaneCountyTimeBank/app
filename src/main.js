@@ -1,4 +1,4 @@
-/* global window document */
+/* global window document _paq */
 
 import 'babel-polyfill';
 
@@ -274,14 +274,28 @@ Vue.filter('event_to_datetime_details', event_to_datetime_details);
         handle_panels();
     });
 
+
+    // https://developer.matomo.org/api-reference/tracking-javascript
+    // https://developer.matomo.org/guides/tracking-javascript-guide
+    //
+    // TODO later: trackSiteSearch, trackEvent, setUserId, resetUserId
+
+    function track_page_view() {
+        // TODO later: give pages better document titles so the logs are better..
+        _paq.push(['setCustomUrl', window.location.href]);
+        _paq.push(['trackPageView']);
+    }
+
     window.f7.onPageInit('*', (pg) => {
         current_page = pg.name;
         handle_panels();
+        track_page_view();
     });
 
     window.f7.onPageReinit('*', (pg) => {
         current_page = pg.name;
         handle_panels();
+        track_page_view();
     });
 
     if (window.location.pathname === '/') {
