@@ -8,15 +8,11 @@
 
     <f7-block-title class="post-title">{{post.title}}</f7-block-title>
     <f7-block inner>
-        <div class="post-date" v-if="post.created">{{post.created | timestamp_to_date}}</div>
+        <div class="post-date" v-if="post.created">{{post.changed | timestamp_to_date}}</div>
 
         {{post | post_type_desc}} 
         <f7-link v-if="post.user_name" :href="post | profile_link" @click="viewProfile(post)">{{post.user_name}}</f7-link>
 
-        <!--
-        TODO: if more than one or two categories, put these into a dropdown or something like that w/ a label w/ the count
-              so that the categories don't take up too much space..
-        -->
         <div class="post-chips">
             <f7-chip v-if="post.area" :text="post.area" bg="purple" color="white"></f7-chip>
             <template v-if="post.categories" v-for="category in post.categories">
