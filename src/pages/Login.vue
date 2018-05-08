@@ -67,7 +67,33 @@
             };
         },
 
+        created () {
+            if (!localStorage.user_id) {
+                // the user hasn't logged in via the app
+                // but they may be logged into the site
+                // so we check if they are and then automatically log them into the app if they are logged into the site
+
+                Timebank.get_current_user((user) => {
+                    if (user && user.uid !== 0) {
+                        this.loginSuccess(user.uid);
+                    }
+                });
+            }
+        },
+
         methods: {
+
+            loginSuccess (user_id) {
+                localStorage.user_id = user_id;
+                window.timebank_event_bus.$emit('login');
+
+                // TODO later: use a different router that uses pushState to get better URLs..
+                //             but then would have to have Apache know to load a specific page for a given url..
+
+                // XXX: need to reference router this way when the component could be loaded w/o a hash path being set
+                //      (eg. any component referenced from App.vue)
+                this.$f7.mainView.router.load({url: '/home'});
+            },
 
             login () {
 
@@ -81,17 +107,8 @@
                     this.email,
                     password,
                     user_id => {
-                        localStorage.user_id = user_id;
-                        window.timebank_event_bus.$emit('login');
-
                         this.$f7.hidePreloader();
-
-                        // TODO later: use a different router that uses pushState to get better URLs..
-                        //             but then would have to have Apache know to load a specific page for a given url..
-
-                        // XXX: need to reference router this way when the component could be loaded w/o a hash path being set
-                        //      (eg. any component referenced from App.vue)
-                        this.$f7.mainView.router.load({url: '/home'});
+                        this.loginSuccess(user_id);
                     },
                     (status, message) => {
                         var err;
