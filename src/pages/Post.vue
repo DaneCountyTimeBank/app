@@ -14,7 +14,7 @@
         <f7-link v-if="post.user_name" :href="post | profile_link" @click="viewProfile(post)">{{post.user_name}}</f7-link>
 
         <div class="post-chips">
-            <f7-chip v-if="post.area" :text="post.area" bg="purple" color="white"></f7-chip>
+            <f7-chip v-if="post_area" :text="post_area" bg="purple" color="white"></f7-chip>
             <template v-if="post.categories" v-for="category in post.categories">
                 &nbsp;<f7-chip :text="category.name" bg="indigo" color="white"></f7-chip>
             </template>
@@ -108,7 +108,6 @@
             var post = this.$root.post || {
                 title: 'Post ' + this.post_id,
                 user_name: null,
-                area: null,
                 body: '',
                 image: null,
                 categories: [],
@@ -118,6 +117,7 @@
 
             return {
                 post: post,
+                post_area: null,
                 message: null,
                 reply: 0,
                 post_loaded: false,
@@ -261,12 +261,22 @@
             Timebank.get_post(
                 this.post_id,
                 post => {
-                    if (!post.area) post.area = this.post.area; // b/c posts from get_post don't yet have area
-
                     this.own_post = (post.user_id * 1 === current_user_id);
                     this.post = post;
 
                     this.post_word = (post.type === 'offer' ? 'Offer' : 'Request');
+
+                    if (this.$root.post && this.$root.post.area && this.$root.post.post_id === this.post_id) {
+                        this.post_area = this.$root.post.area;
+                    } else {
+                        // have to get post area from the user
+                        Timebank.get_user(
+                            this.post.user_id,
+                            user => {
+                                if (user.location) this.post.area = this.post_area = user.location.area;
+                            }
+                        );
+                    }
 
                     this.post_loaded = true;
                 },
