@@ -44,7 +44,7 @@
                 <p>
                     <template v-if="user.phones">
                         <template v-for="phone in user.phones">
-                            {{phone}}<br />
+                            <f7-link external :href="'tel:' + phone">{{phone}}</f7-link><br />
                         </template>
                     </template>
                 </p>
@@ -73,8 +73,15 @@
             </f7-block>
         </template>
 
+        <template v-if="user.offline">
+            <f7-block>
+                <strong>Offline Member</strong><br />
+                <em>(contact by phone above)</em>
+            </f7-block>
+        </template>
+
         <f7-list>
-            <f7-list-item v-if="!viewing_self" :link="user | message_link" @click="setViewUserName()" title="Send Message"></f7-list-item>
+            <f7-list-item v-if="!viewing_self && !user.offline" :link="user | message_link" @click="setViewUserName()" title="Send Message"></f7-list-item>
             <f7-list-item :link="user | posts_link" title="Offers &amp; Requests" @click="setViewUserName()"></f7-list-item> 
             <f7-list-item v-if="viewing_self" link="/exchanges" title="Exchanges"></f7-list-item> 
         </f7-list>

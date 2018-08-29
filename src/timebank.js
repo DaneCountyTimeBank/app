@@ -356,6 +356,11 @@ function _user(user) {
     if (user.profile_notes && user.profile_notes.und) {
         user.description = user.profile_notes.und[0].safe_value;
     }
+
+    if (get(user, 'account_offline.und[0].value') === '1') {
+        user.offline = true;
+    }
+
     return user;
 }
 

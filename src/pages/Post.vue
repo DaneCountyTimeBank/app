@@ -31,10 +31,21 @@
 
         <div class="post-body" v-html="post.body"></div>
 
-        <template v-if="post_loaded && !reply">
+        <f7-block v-if="!post_load_error && user_load_error">
+            <strong>Error loading user - please try again later.</strong>
+        </f7-block>
+
+        <template v-if="post_loaded && user_loaded && !reply">
             <div class="post-buttons buttons-row">
                 <template v-if="!own_post">
-                    <f7-button @click="showReply()" class="button button-fill button-raised">Reply</f7-button>
+                    
+                    <template v-if="!user.offline">
+                        <f7-button @click="showReply()" class="button button-fill button-raised">Reply</f7-button>
+                    </template>
+                    <template v-if="user.offline">
+                        <f7-button external :href="'tel:' + user.phones[0]" class="button button-fill button-raised phone-button"><i class="material-icons">phone</i> &nbsp; {{user.phones[0]}}</f7-button>
+                    </template>
+
                     <f7-button @click="submitPayment(post)" :href="post | payment_link" class="button button-raised">{{post | payment_text }}</f7-button>
                 </template>
                 <template v-if="own_post">
@@ -60,6 +71,11 @@
                     -->
                 </template>
             </div>
+
+            <template v-if="!own_post && user.offline">
+                <div class="offline-notice">Offline Member (contact by phone)</div>
+            </template>
+
         </template>
 
         <template v-if="post_loaded && reply">
@@ -124,6 +140,9 @@
                 post_load_error: false,
                 own_post: false,
                 send_disabled: false,
+                user_loaded: false,
+                user_load_error: false,
+                user: false
             };
         },
 
@@ -266,17 +285,17 @@
 
                     this.post_word = (post.type === 'offer' ? 'Offer' : 'Request');
 
-                    if (this.$root.post && this.$root.post.area && this.$root.post.post_id === this.post_id) {
-                        this.post_area = this.$root.post.area;
-                    } else {
-                        // have to get post area from the user
-                        Timebank.get_user(
-                            this.post.user_id,
-                            user => {
-                                if (user.location) this.post.area = this.post_area = user.location.area;
-                            }
-                        );
-                    }
+                    Timebank.get_user(
+                        this.post.user_id,
+                        user => {
+                            if (user.location) this.post.area = this.post_area = user.location.area;
+                            this.user = user;
+                            this.user_loaded = true;
+                        },
+                        () => {
+                            this.user_load_error = true;
+                        }
+                    );
 
                     this.post_loaded = true;
                 },
@@ -322,6 +341,15 @@
 }
 .post-buttons {
     margin-bottom: 60px;
+}
+
+.phone-button i {
+    vertical-align: middle;
+}
+
+.offline-notice {
+    color: #666;
+    margin-top: -30px;
 }
 
 </style>
