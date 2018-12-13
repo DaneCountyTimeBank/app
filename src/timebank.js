@@ -1125,16 +1125,16 @@ function get_event(event_id, success, error) {
             body_html: get_node_body(event),
         };
 
-        if (event.field_date_recurring) { // DCTB specific
+        if (event.field_event_date_repeating) { // DCTB specific
 
-            // event.field_date_recurring: {"und":[{"value":"2018-02-15T19:00:00","value2":"2018-02-15T20:00:00","timezone":"America/Chicago","timezone_db":"UTC","date_type":"date"},
+            // event.field_event_date_repeating: {"und":[{"value":"2018-02-15T19:00:00","value2":"2018-02-15T20:00:00","timezone":"America/Chicago","timezone_db":"UTC","date_type":"date"},
             //
             // und is an array of dates, in order from oldest date to newest
             // the oldest date may be in the past though
             // 
             // and value & value2 are in UTC, so they need to be converted to local time
 
-            var dates = event.field_date_recurring.und,
+            var dates = event.field_event_date_repeating.und,
                 now = (new Date()).getTime();
 
             // get each date that is in the future
